@@ -122,7 +122,13 @@
 			<div class="live-ring"></div>
 			<div class="live-ring"></div>
 		{/if}
-		<img src={siteConfig.bio.avatar} alt="Avatar" class="h-32 w-32 rounded-full" />
+		{#if isLive}
+			<a href="https://live.bilibili.com/12005649" target="_blank" rel="noopener noreferrer">
+				<img src={siteConfig.bio.avatar} alt="Avatar" class="h-32 w-32 rounded-full cursor-pointer" />
+			</a>
+		{:else}
+			<img src={siteConfig.bio.avatar} alt="Avatar" class="h-32 w-32 rounded-full" />
+		{/if}
 		{#if isLive}
 			<div class="live-badge">
 				<div class="live-dot"></div>
