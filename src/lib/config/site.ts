@@ -20,7 +20,7 @@ export const siteConfig = {
 		links: [
 			{
 				name: 'QQ群',
-				icon: 'icon-park:tencent-qq',
+				icon: '/icon/QQ.svg',
 				url: 'https://qm.qq.com/q/FWqOHlwL2m'
 			},
 			{

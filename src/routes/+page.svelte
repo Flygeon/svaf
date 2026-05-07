@@ -155,17 +155,21 @@
 	<!-- 社交媒体链接 -->
 	<div class="flex flex-wrap gap-3 justify-center">
 		{#each siteConfig.bio.links as link}
+			{@const isLocalImage = link.icon.startsWith('/')}
 			<a href={link.url} target="_blank" rel="noopener noreferrer">
 				<Button variant="outline" class="flex items-center gap-2">
-					<Icon 
-						icon={link.icon} 
-						class="w-5 h-5"
-						style={link.name === 'QQ群' ? 'color: #12B7F5' : 
-						       link.name === 'Telegram群' ? 'color: #0088cc' : 
-						       link.name === 'Bilibili' ? 'color: #fb7299' : 
-						       link.name === 'GitHub' ? 'color: #333333' : 
-						       link.name === 'Folo' ? 'color: #ff6b35' : ''}
-					/>
+					{#if isLocalImage}
+						<img src={link.icon} alt={link.name} class="w-5 h-5" />
+					{:else}
+						<Icon
+							icon={link.icon}
+							class="w-5 h-5"
+							style={link.name === 'Telegram群' ? 'color: #0088cc' :
+							       link.name === 'Bilibili' ? 'color: #fb7299' :
+							       link.name === 'GitHub' ? 'color: #333333' :
+							       link.name === 'Folo' ? 'color: #ff6b35' : ''}
+						/>
+					{/if}
 					<span class="text-sm font-medium">{link.name}</span>
 				</Button>
 			</a>
