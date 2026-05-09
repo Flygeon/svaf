@@ -106,7 +106,7 @@
 								</div>
 								<div class="flex-1 overflow-hidden">
 									<div class="mb-1 truncate font-semibold">{friend.name}</div>
-									<div class="line-clamp-2 text-sm text-muted-foreground">
+									<div class="line-clamp-2 text-sm text-muted-foreground" title={friend.description || '暂无描述'}>
 										{friend.description || '暂无描述'}
 									</div>
 								</div>
