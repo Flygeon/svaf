@@ -348,7 +348,7 @@
 	<div class="space-y-6 mo-stagger" use:staggerChildren>
 		{#each paginatedPosts as { post, matchedLines }}
 			<a href="/posts/{post.slug}" class="block">
-				<Card.Root class="group transition-all hover:shadow-lg">
+				<Card.Root class="group transition-all hover:shadow-lg ring-0">
 					<Card.Content>
 						<div class="flex flex-col gap-4 md:flex-row">
 							{#if post.metadata.image}
