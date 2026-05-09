@@ -159,7 +159,7 @@
 		{#if pageViewsLoaded}
 			<div transition:slide={{ duration: 350, easing: quintOut }}>
 				<p class="text-sm text-muted-foreground">
-					全站浏览量: <PageViews pathname="/" cacheKey="homepage-pageviews" />
+					您是第 <PageViews pathname="/" cacheKey="homepage-pageviews" prefix="" suffix="个访客" />
 				</p>
 			</div>
 		{/if}

@@ -9,12 +9,14 @@
 		cacheKey,
 		class: className = '',
 		prefix = '',
+		suffix = '次浏览',
 		onloaded
 	}: {
 		pathname: string;
 		cacheKey?: string;
 		class?: string;
 		prefix?: string;
+		suffix?: string;
 		onloaded?: () => void;
 	} = $props();
 
@@ -50,5 +52,5 @@
 </script>
 
 {#if pageViews !== null}
-	<span class={className} transition:fly={{ y: 8, duration: 350, easing: quintOut }}>{prefix}{pageViews.toLocaleString()} 次浏览</span>
+	<span class={className} transition:fly={{ y: 8, duration: 350, easing: quintOut }}>{prefix}{pageViews.toLocaleString()} {suffix}</span>
 {/if}
