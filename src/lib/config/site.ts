@@ -89,8 +89,8 @@ export const siteConfig = {
 	},
 	navLinks: [
 		{ label: '博客', icon: 'mdi:post-outline', href: '/posts' },
-		{ label: '论坛', icon: 'mdi:forum', href: '/forum', highlight: true, badge: 'NEW' },
-		{ label: 'AI 生图', icon: 'mdi:palette', href: 'https://ai.2x.nz' },
+		{ label: '论坛', icon: 'mdi:forum', href: '/forum' },
+		{ label: 'AI 生图', icon: 'mdi:palette', href: 'https://ai.2x.nz', badge: '新' },
 		{ label: '课程表', icon: 'mdi:calendar-month', href: '/timetable' },
 		{ label: '封面制作', icon: 'mdi:image-edit', href: '/cover' },
 		{ label: '画廊', icon: 'mdi:image-multiple', href: '/gallery' },
