@@ -170,10 +170,12 @@
 }
 
 /* 隐藏代码块滚动条（Shift+滚轮 / 触屏仍可滚动） */
-pre::-webkit-scrollbar {
+pre::-webkit-scrollbar,
+pre code::-webkit-scrollbar {
 	display: none;
 }
-pre {
+pre,
+pre code {
 	scrollbar-width: none;
 }
 
