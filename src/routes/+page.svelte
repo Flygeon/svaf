@@ -185,7 +185,7 @@
 		{/each}
 	</div>
 
-	<div class="mx-auto max-w-xs h-px bg-border mo-fade-in" use:fadeIn></div>
+	<div class="mx-auto max-w-xs mo-fade-in" use:fadeIn><hr class="h-px bg-border border-0" /></div>
 
 	<!-- 导航按钮 -->
 	<div class="flex flex-wrap gap-3 justify-center mo-stagger" use:staggerChildren>
@@ -222,7 +222,7 @@
 		</a>
 	</div>
 
-	<div class="mx-auto max-w-xs h-px bg-border mo-fade-in" use:fadeIn></div>
+	<div class="mx-auto max-w-xs mo-fade-in" use:fadeIn><hr class="h-px bg-border border-0" /></div>
 
 	<SponsorBanners />
 </div>
