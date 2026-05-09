@@ -85,7 +85,26 @@
 		if (isLoadingViews) return;
 		isLoadingViews = true;
 		const currentPosts = paginatedPosts;
-		const pathnames = currentPosts.map(({ post }) => `/posts/${post.slug}/`);
+
+		// 从 SPA 缓存中读取已有的浏览量，命中则直接显示（无动画）
+		const uncachedPosts: typeof currentPosts = [];
+		const viewsMap: Record<string, number> = { ...pageViews };
+		for (const { post } of currentPosts) {
+			const cached = spaCache.peek<number>(`pv:${post.slug}`);
+			if (cached !== undefined) {
+				viewsMap[post.slug] = cached;
+			} else {
+				uncachedPosts.push({ post });
+			}
+		}
+		pageViews = viewsMap;
+
+		// 仅请求未缓存的文章
+		if (uncachedPosts.length === 0) {
+			isLoadingViews = false;
+			return;
+		}
+		const pathnames = uncachedPosts.map(({ post }) => `/posts/${post.slug}/`);
 		try {
 			const response = await fetch(siteConfig.services.pageViews, {
 				method: 'POST',
@@ -94,11 +113,23 @@
 			});
 			if (response.ok) {
 				const views = await response.json() as number[];
-				const viewsMap: Record<string, number> = { ...pageViews };
-				currentPosts.forEach(({ post }, index) => {
-					viewsMap[post.slug] = views[index] || 0;
+				const newSlugs: string[] = [];
+				uncachedPosts.forEach(({ post }, index) => {
+					const v = views[index] || 0;
+					viewsMap[post.slug] = v;
+					spaCache.set(`pv:${post.slug}`, v);
+					newSlugs.push(post.slug);
 				});
-				pageViews = viewsMap;
+				// 先让 {#if} 初始为 false，再设置数据触发 transition
+				for (const slug of newSlugs) {
+					delete pageViews[slug];
+				}
+				pageViews = { ...pageViews };
+				await tick();
+				for (const slug of newSlugs) {
+					pageViews[slug] = viewsMap[slug];
+				}
+				pageViews = { ...pageViews };
 			}
 		} catch (e) {
 			console.error(e);
@@ -242,7 +273,7 @@
 		});
 	}
 	
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { spaCache } from '$lib/utils/spaCache';
 	
 	onMount(() => {
@@ -337,10 +368,9 @@
 										<span class="text-sm text-muted-foreground">·</span>
 										<span class="text-sm text-muted-foreground">约 {getPostStats(post.slug)!.readTime} 分钟</span>
 									{/if}
-									{#if pageViews[post.slug]}
+									{#if pageViews[post.slug] !== undefined}
 										<div class="inline" transition:slide={{ duration: 350, easing: quintOut }}>
-											<span class="text-sm text-muted-foreground">·</span>
-											<span class="text-sm text-muted-foreground">{pageViews[post.slug].toLocaleString()} 次浏览</span>
+											<span class="text-sm text-muted-foreground">· {pageViews[post.slug].toLocaleString()} 次浏览</span>
 										</div>
 									{/if}
 								</div>

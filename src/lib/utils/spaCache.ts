@@ -33,6 +33,14 @@ class SPACache {
 	}
 
 	/**
+	 * 同步读取缓存，不存在则返回 undefined
+	 */
+	peek<T>(key: string): T | undefined {
+		const entry = this.cache.get(key);
+		return entry ? (entry.data as T) : undefined;
+	}
+
+	/**
 	 * 手动设置缓存
 	 */
 	set<T>(key: string, data: T): void {
