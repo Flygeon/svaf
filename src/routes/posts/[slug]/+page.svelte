@@ -166,7 +166,7 @@
 			<span class="text-sm text-muted-foreground">·</span>
 			<PageViews
 				pathname="/posts/{data.slug}/"
-				cacheKey="post-pageviews-{data.slug}"
+				cacheKey="pv:{data.slug}"
 				class="text-sm text-muted-foreground"
 			/>
 		</div>
