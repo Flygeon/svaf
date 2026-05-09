@@ -9,6 +9,7 @@
 	import { siteConfig } from '$lib/config/site';
 	import { slide } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
+	import { spaCache } from '$lib/utils/spaCache';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -19,7 +20,13 @@
 	let isLoading = $state(false);
 	let hasLoaded = $state(false);
 
-	let pageViews = $state<Record<string, number>>({});
+	// 预填充 SPA 缓存中的浏览量（首次渲染前，避免 transition 动画）
+	const _initialViews: Record<string, number> = {};
+	for (const post of data.posts) {
+		const v = spaCache.peek<number>(`pv:${post.slug}`);
+		if (v !== undefined) _initialViews[post.slug] = v;
+	}
+	let pageViews = $state<Record<string, number>>(_initialViews);
 	let isLoadingViews = $state(false);
 
 	let currentPage = $state(1);
@@ -274,7 +281,6 @@
 	}
 	
 	import { onMount, tick } from 'svelte';
-	import { spaCache } from '$lib/utils/spaCache';
 	
 	onMount(() => {
 		loadRSS();
