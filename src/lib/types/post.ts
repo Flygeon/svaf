@@ -1,6 +1,6 @@
 export interface PostMetadata {
 	title: string;
-	image: string;
+	image?: string;
 	published: string;
 	pinned: boolean;
 	description: string;
