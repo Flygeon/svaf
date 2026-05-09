@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import Icon from '@iconify/svelte';
+	import { staggerChildren } from '$lib/utils/motion';
 </script>
 
-<div class="w-full max-w-md flex flex-col gap-4">
+<div class="w-full max-w-md flex flex-col gap-4 mo-stagger" use:staggerChildren>
 	<!-- DeepWiki -->
 	<a
 		href="https://deepwiki.com/afoim/svaf"
