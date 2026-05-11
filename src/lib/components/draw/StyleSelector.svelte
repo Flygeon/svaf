@@ -6,10 +6,12 @@
 
 	let {
 		value = $bindable(''),
-		onselect
+		onselect,
+		showTitle = true
 	}: {
 		value?: string;
 		onselect?: (tags: string, name: string) => void;
+		showTitle?: boolean;
 	} = $props();
 
 	let styles = $state<DrawStyle[]>([]);
@@ -57,18 +59,20 @@
 
 {#if styles.length > 0}
 	<div class="space-y-2">
-		<div class="flex items-center justify-between">
-			<h3 class="text-sm font-medium flex items-center gap-1.5">
-				<Icon icon="mdi:palette-outline" class="size-4" />
-				风格
-			</h3>
-			<button
-				class="text-xs text-muted-foreground hover:text-foreground transition-colors"
-				onclick={() => (showAll = !showAll)}
-			>
-				{showAll ? '收起' : '更多'}
-			</button>
-		</div>
+		{#if showTitle}
+			<div class="flex items-center justify-between">
+				<h3 class="text-sm font-medium flex items-center gap-1.5">
+					<Icon icon="mdi:palette-outline" class="size-4" />
+					风格
+				</h3>
+				<button
+					class="text-xs text-muted-foreground hover:text-foreground transition-colors"
+					onclick={() => (showAll = !showAll)}
+				>
+					{showAll ? '收起' : '更多'}
+				</button>
+			</div>
+		{/if}
 
 		{#if loading}
 			<div class="text-xs text-muted-foreground py-4 text-center">加载中...</div>

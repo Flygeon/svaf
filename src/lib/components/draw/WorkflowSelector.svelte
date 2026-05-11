@@ -8,11 +8,13 @@
 	let {
 		value = $bindable(''),
 		onselect,
-		onpromptload
+		onpromptload,
+		showTitle = true
 	}: {
 		value?: string;
 		onselect?: (wf: DrawWorkflow) => void;
 		onpromptload?: (positive: string, negative: string) => void;
+		showTitle?: boolean;
 	} = $props();
 
 	let workflows = $state<DrawWorkflow[]>([]);
@@ -98,28 +100,30 @@
 </script>
 
 <div class="space-y-2">
-	<div class="flex items-center justify-between">
-		<h3 class="text-sm font-medium flex items-center gap-1.5">
-			<Icon icon="mdi:cog-outline" class="size-4" />
-			工作流
-		</h3>
-		<div class="flex items-center gap-1">
-			<button
-				class="p-1 rounded hover:bg-muted transition-colors"
-				onclick={() => (showSearch = !showSearch)}
-				title="搜索"
-			>
-				<Icon icon="mdi:magnify" class="size-4" />
-			</button>
-			<button
-				class="p-1 rounded hover:bg-muted transition-colors"
-				onclick={loadWorkflows}
-				title="刷新"
-			>
-				<Icon icon="mdi:refresh" class="size-4" />
-			</button>
+	{#if showTitle}
+		<div class="flex items-center justify-between">
+			<h3 class="text-sm font-medium flex items-center gap-1.5">
+				<Icon icon="mdi:cog-outline" class="size-4" />
+				工作流
+			</h3>
+			<div class="flex items-center gap-1">
+				<button
+					class="p-1 rounded hover:bg-muted transition-colors"
+					onclick={() => (showSearch = !showSearch)}
+					title="搜索"
+				>
+					<Icon icon="mdi:magnify" class="size-4" />
+				</button>
+				<button
+					class="p-1 rounded hover:bg-muted transition-colors"
+					onclick={loadWorkflows}
+					title="刷新"
+				>
+					<Icon icon="mdi:refresh" class="size-4" />
+				</button>
+			</div>
 		</div>
-	</div>
+	{/if}
 
 	{#if showSearch}
 		<Input
