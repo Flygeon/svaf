@@ -143,21 +143,26 @@ export async function fetchFeatured() {
 	return drawRequest<import('../types').DrawFeaturedResponse>('/api/output/featured');
 }
 
+function _appendToken(url: URL): string {
+	const token = forumAuth.getToken();
+	if (token) url.searchParams.set('token', token);
+	return url.toString();
+}
+
 export function getImageUrl(path: string, full = false): string {
 	const baseUrl = get(drawEnv.baseUrl);
 	const url = new URL('/api/output/file', baseUrl);
 	url.searchParams.set('path', path);
 	if (full) url.searchParams.set('full', '1');
-	return url.toString();
+	return _appendToken(url);
 }
 
 export function getThumbnailUrl(path: string): string {
 	const baseUrl = get(drawEnv.baseUrl);
 	const url = new URL('/api/thumbnail', baseUrl);
 	url.searchParams.set('path', path);
-	return url.toString();
+	return _appendToken(url);
 }
-
 
 export function getImageProxyUrl(filename: string, subfolder = '', type = 'output'): string {
 	const baseUrl = get(drawEnv.baseUrl);
@@ -165,5 +170,5 @@ export function getImageProxyUrl(filename: string, subfolder = '', type = 'outpu
 	url.searchParams.set('filename', filename);
 	if (subfolder) url.searchParams.set('subfolder', subfolder);
 	url.searchParams.set('type', type);
-	return url.toString();
+	return _appendToken(url);
 }
