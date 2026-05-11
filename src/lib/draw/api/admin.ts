@@ -223,3 +223,9 @@ export async function updateLlmConfig(partial: Partial<AdminLlmConfig>) {
 		json: partial
 	});
 }
+
+export async function testLlmConfig() {
+	return drawRequest<{ ok: boolean; provider: string; reply?: string; error?: string }>('/api/draw/admin/llm_config/test', {
+		method: 'POST'
+	});
+}

@@ -64,6 +64,8 @@
 	let llmDefaults = $state<AdminLlmConfig | null>(null);
 	let llmProviders = $state<string[]>([]);
 	let llmThinkingOptions = $state<string[]>([]);
+	let llmTestResult = $state<{ ok: boolean; provider: string; reply?: string; error?: string } | null>(null);
+	let llmTesting = $state(false);
 
 	// GC
 	let gcResult = $state<Record<string, number> | null>(null);
@@ -382,6 +384,18 @@
 			showMsg('error', e instanceof Error ? e.message : '保存失败');
 		} finally {
 			loading = false;
+		}
+	}
+
+	async function testLlmConfig() {
+		llmTesting = true;
+		llmTestResult = null;
+		try {
+			llmTestResult = await admin.testLlmConfig();
+		} catch (e) {
+			llmTestResult = { ok: false, provider: '', error: e instanceof Error ? e.message : '测试失败' };
+		} finally {
+			llmTesting = false;
 		}
 	}
 
@@ -1160,10 +1174,27 @@
 								<Label class="text-xs">流式输出（SSE）</Label>
 							</div>
 
-							<Button onclick={saveLlmConfig} disabled={loading}>
-								<Icon icon="mdi:content-save" class="size-4 mr-1" />
-								保存配置
-							</Button>
+							<div class="flex gap-2">
+								<Button onclick={saveLlmConfig} disabled={loading}>
+									<Icon icon="mdi:content-save" class="size-4 mr-1" />
+									保存配置
+								</Button>
+								<Button variant="outline" onclick={testLlmConfig} disabled={llmTesting || loading}>
+									<Icon icon={llmTesting ? 'mdi:loading' : 'mdi:flask-outline'} class="size-4 mr-1 {llmTesting ? 'animate-spin' : ''}" />
+									测试
+								</Button>
+							</div>
+							{#if llmTestResult}
+								<Alert variant={llmTestResult.ok ? 'default' : 'destructive'}>
+									<AlertDescription class="text-xs">
+										{#if llmTestResult.ok}
+											<span class="font-medium text-green-600">✓ {llmTestResult.provider}</span> — {llmTestResult.reply}
+										{:else}
+											<span class="font-medium">✗ 失败</span> — {llmTestResult.error}
+										{/if}
+									</AlertDescription>
+								</Alert>
+							{/if}
 						{/if}
 					</CardContent>
 				</Card>
