@@ -1042,7 +1042,6 @@
 							{@render limitField('GPU 轮询间隔（ms）', 'gpu_poll_interval_ms', 'number')}
 							{@render limitField('GPU 缓存 TTL（ms）', 'gpu_cache_ttl_ms', 'number')}
 							{@render limitField('GC 间隔（小时）', 'gc_interval_hours', 'number')}
-							{@render limitField('精选提示', 'featured_tip', 'text')}
 							<Button onclick={saveLimits} disabled={loading}>
 								<Icon icon="mdi:content-save" class="size-4 mr-1" />
 								保存配置
