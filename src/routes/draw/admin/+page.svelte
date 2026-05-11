@@ -246,6 +246,20 @@
 		}
 	}
 
+	async function handleAddSelectedToFeatured() {
+		const paths = [...selectedPaths];
+		if (!paths.length) return;
+		loading = true;
+		try {
+			await Promise.all(paths.map((p) => admin.addFeatured(p)));
+			showMsg('success', `已将 ${paths.length} 张图片加入精选`);
+		} catch (e) {
+			showMsg('error', e instanceof Error ? e.message : '操作失败');
+		} finally {
+			loading = false;
+		}
+	}
+
 	function toggleSelect(path: string) {
 		const next = new Set(selectedPaths);
 		if (next.has(path)) next.delete(path);
@@ -864,6 +878,10 @@
 								<Icon icon="mdi:refresh" class="size-4 mr-1" />刷新
 							</Button>
 							{#if selectedPaths.size > 0}
+								<Button variant="default" size="sm" onclick={handleAddSelectedToFeatured} disabled={loading}>
+									<Icon icon="mdi:star" class="size-4 mr-1" />
+									加入精选 ({selectedPaths.size})
+								</Button>
 								<Button variant="destructive" size="sm" onclick={handleDeleteSelected} disabled={loading}>
 									<Icon icon="mdi:delete" class="size-4 mr-1" />
 									删除选中 ({selectedPaths.size})

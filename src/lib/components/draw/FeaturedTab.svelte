@@ -70,6 +70,7 @@
 	{:else}
 		<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
 			{#each items as item, i}
+			<div class="relative group">
 				<button
 					type="button"
 					class="aspect-square rounded-lg overflow-hidden border hover:ring-2 hover:ring-primary/50 transition-all cursor-pointer"
@@ -82,6 +83,10 @@
 						loading="lazy"
 					/>
 				</button>
+				<div class="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[10px] px-1 py-0.5 truncate rounded-b-lg">
+					{item.creator_id || '?'}
+				</div>
+			</div>
 			{/each}
 		</div>
 	{/if}
