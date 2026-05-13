@@ -72,23 +72,43 @@ export function popIn(node: HTMLElement, opts: { delay?: number; duration?: numb
 }
 
 /**
- * Svelte action: 列表项依次出现（交错动画）
+ * Svelte action: 列表项依次出现（交错动画），支持动态增删子元素
  */
 export function staggerChildren(node: HTMLElement, opts: { delay?: number; duration?: number } = {}) {
 	const { delay = 0.1, duration = 0.4 } = opts;
 
-	const children = Array.from(node.children) as HTMLElement[];
+	let hasAnimated = false;
 
-	const controls = inView(node, () => {
+	function animateNewChildren() {
+		const children = Array.from(node.children).filter(
+			(child): child is HTMLElement => child instanceof HTMLElement && !child.classList.contains('mo-ready')
+		);
+		if (children.length === 0) return;
+
 		children.forEach((child) => child.classList.add('mo-ready'));
 		animate(
 			children,
 			{ opacity: [0, 1], transform: ['translateY(15px)', 'translateY(0px)'] },
 			{ duration, delay: stagger(delay), easing: spring() }
 		);
+	}
+
+	const controls = inView(node, () => {
+		hasAnimated = true;
+		animateNewChildren();
 	});
 
-	return { destroy() { controls(); } };
+	const observer = new MutationObserver(() => {
+		if (hasAnimated) animateNewChildren();
+	});
+	observer.observe(node, { childList: true });
+
+	return {
+		destroy() {
+			controls();
+			observer.disconnect();
+		}
+	};
 }
 
 export { animate, inView, stagger, spring };
