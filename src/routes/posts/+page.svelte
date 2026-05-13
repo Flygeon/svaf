@@ -249,9 +249,8 @@
 	
 	let totalPages = $derived(Math.ceil(filteredPostsWithMatches.length / postsPerPage));
 	
-	// 当搜索条件改变时重置到第一页并加载访问量
+	// 当筛选条件改变时重置到第一页（搜索词修改由 oninput 同步重置）
 	$effect(() => {
-		searchQuery;
 		searchFilters.title;
 		searchFilters.description;
 		searchFilters.content;
@@ -307,6 +306,7 @@
 			type="text"
 			bind:value={searchQuery}
 			onfocus={loadRSS}
+			oninput={() => { currentPage = 1; expandedCards = {}; }}
 			placeholder="搜索文章标题、描述或内容..."
 			class="w-full"
 		/>
