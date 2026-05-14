@@ -114,25 +114,20 @@ export async function resolveApiRedirect(): Promise<void> {
 	const baseUrl = get(drawEnv.baseUrl);
 	console.log(`当前API：${baseUrl}`);
 	try {
-		const resp = await fetch(baseUrl, { method: 'HEAD', redirect: 'manual' });
-		console.log('原始响应状态:', resp.status, resp.statusText);
-		resp.headers.forEach((v, k) => console.log('  响应头:', k, '=', v));
-		if (resp.status >= 300 && resp.status < 400) {
-			const location = resp.headers.get('location');
-			if (location) {
-				const resolved = new URL(location, baseUrl).toString().replace(/\/+$/, '');
-				if (resolved !== baseUrl) {
-					console.log(`检查重定向：有，目标：${resolved}`);
-					drawEnv.customBaseUrl.set(resolved);
-					console.log('API可用性：✅');
-					return;
-				}
-			}
+		// 不设置 redirect: 'manual'，让浏览器自动跟随重定向，
+		// 通过 resp.url 获取最终地址（该 302 响应已携带 CORS 头）
+		const resp = await fetch(baseUrl, { method: 'HEAD' });
+		const finalUrl = resp.url.replace(/\/+$/, '');
+		console.log('最终响应URL:', finalUrl);
+		if (finalUrl !== baseUrl) {
+			console.log(`检查重定向：有，目标：${finalUrl}`);
+			drawEnv.customBaseUrl.set(finalUrl);
+		} else {
+			console.log('检查重定向：无，锁定API');
 		}
-		console.log('检查重定向：无，锁定API');
 		console.log('API可用性：✅');
-	} catch {
-		console.log('检查重定向：失败，保留原地址');
-		console.log('API可用性：✅（使用原地址）');
+	} catch (e) {
+		console.log('检查重定向：请求异常', e);
+		console.log('API可用性：❌，使用原地址');
 	}
 }
