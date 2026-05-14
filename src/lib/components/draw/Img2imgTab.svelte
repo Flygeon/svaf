@@ -260,20 +260,6 @@
 		</Alert>
 	{/if}
 
-	{#if globalBusy && !isGenerating}
-		<Alert>
-			<Icon icon="mdi:loading" class="size-4 animate-spin" />
-			<AlertDescription class="text-xs">
-				他人生图中
-				{#if otherStage === 'llm'}
-					（LLM处理）
-				{:else if otherMax > 0}
-					（{Math.round(otherValue / otherMax * 100)}%）
-				{/if}
-			</AlertDescription>
-		</Alert>
-	{/if}
-
 	<!-- Image Upload -->
 	<div class="space-y-2">
 		<div class="flex items-center justify-between">
