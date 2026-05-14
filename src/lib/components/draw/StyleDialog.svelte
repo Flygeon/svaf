@@ -42,6 +42,13 @@
 				选择风格
 			</Dialog.Title>
 		</Dialog.Header>
+			<Dialog.Close>
+				{#snippet child({ props })}
+					<Button variant="ghost" size="icon" class="absolute top-4 right-4" {...props}>
+						<Icon icon="mdi:close" class="size-5" />
+					</Button>
+				{/snippet}
+			</Dialog.Close>
 		<div class="overflow-y-auto min-h-0">
 			<StyleSelector bind:value onselect={handleSelect} showTitle={false} constrainHeight={false} />
 		</div>
