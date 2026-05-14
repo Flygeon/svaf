@@ -190,7 +190,7 @@
 		<!-- Final prompt -->
 		{#if llmFinalPositive}
 			<div class="space-y-1.5">
-				<div class="text-xs font-medium">最终Prompt：</div>
+				<div class="text-xs font-medium">正面提示词：</div>
 				<div class="text-xs bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-md p-2 whitespace-pre-wrap">{llmFinalPositive}</div>
 				{#if llmFinalNegative}
 					<div class="text-xs text-muted-foreground mt-1">负面提示词：</div>
