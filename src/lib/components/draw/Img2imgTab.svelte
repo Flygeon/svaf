@@ -67,6 +67,38 @@
 		dragOverIndex = null;
 	}
 
+	let touchStartX = 0;
+	let touchStartY = 0;
+
+	function handleTouchStart(e: TouchEvent, i: number) {
+		touchStartX = e.touches[0].clientX;
+		touchStartY = e.touches[0].clientY;
+		dragIndex = i;
+	}
+
+	function handleTouchMove(e: TouchEvent) {
+		if (dragIndex === null) return;
+		e.preventDefault();
+		const touch = e.touches[0];
+		const el = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('[data-img-index]') as HTMLElement | null;
+		if (el) {
+			const idx = parseInt(el.dataset.imgIndex || '', 10);
+			if (!isNaN(idx)) dragOverIndex = idx;
+		}
+	}
+
+	function handleTouchEnd() {
+		if (dragIndex !== null && dragOverIndex !== null && dragIndex !== dragOverIndex) {
+			const arr = [...images];
+			const [moved] = arr.splice(dragIndex, 1);
+			arr.splice(dragOverIndex, 0, moved);
+			images = arr;
+			saveState();
+		}
+		dragIndex = null;
+		dragOverIndex = null;
+	}
+
 	// WebSocket progress state
 	let progressMessages = $state<WsRunMessage[]>([]);
 	let showProgress = $state(false);
@@ -277,11 +309,16 @@
 			{#each images as item, i}
 				<div
 					class="relative group {dragOverIndex === i && dragIndex !== null && dragIndex !== i ? 'ring-2 ring-primary rounded-lg' : ''}"
+					data-img-index={i}
 					draggable="true"
 					ondragstart={() => handleDragStart(i)}
 					ondragover={(e) => handleDragOver(e, i)}
 					ondrop={() => handleDrop(i)}
 					ondragend={handleDragEnd}
+					ontouchstart={(e) => handleTouchStart(e, i)}
+					ontouchmove={handleTouchMove}
+					ontouchend={handleTouchEnd}
+					oncontextmenu={(e) => e.preventDefault()}
 					role="button"
 					tabindex="-1"
 				>
