@@ -69,6 +69,30 @@
 	let llmTestResult = $state<{ ok: boolean; provider: string; reply?: string; error?: string } | null>(null);
 	let llmTesting = $state(false);
 
+	const thinkingLabels: Record<string, string> = {
+		off: '关闭',
+		level_minimal: 'minimal（几乎不思考）',
+		level_low: 'low（低延迟）',
+		level_medium: 'medium（平衡）',
+		level_high: 'high（深度推理）',
+		budget_auto: '自动',
+		budget_0: '0（关闭思考）',
+		budget_512: '512 tokens',
+		budget_1024: '1024 tokens',
+		budget_2048: '2048 tokens',
+		budget_4096: '4096 tokens',
+		budget_8192: '8192 tokens',
+		budget_16384: '16384 tokens',
+		budget_24576: '24576 tokens',
+		budget_32768: '32768 tokens',
+	};
+
+	const thinkingGroups: Array<{ label: string; options: string[] }> = [
+		{ label: '关闭', options: ['off'] },
+		{ label: 'Gemini 3 系列 (thinkingLevel)', options: ['level_minimal', 'level_low', 'level_medium', 'level_high'] },
+		{ label: 'Gemini 2.5 系列 (thinkingBudget)', options: ['budget_auto', 'budget_0', 'budget_512', 'budget_1024', 'budget_2048', 'budget_4096', 'budget_8192', 'budget_16384', 'budget_24576', 'budget_32768'] },
+	];
+
 	// GC
 	let gcResult = $state<Record<string, number> | null>(null);
 
@@ -1190,14 +1214,23 @@
 								</div>
 								<div class="space-y-1.5">
 									<Label class="text-xs">思维链</Label>
-									<div class="flex flex-wrap gap-1.5">
-										{#each llmThinkingOptions as opt}
-											<button
-												class="px-2 py-1 text-xs rounded border transition-colors {llmConfig.google_thinking === opt ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:bg-accent'}"
-												onclick={() => { if (llmConfig) llmConfig.google_thinking = opt; }}
-											>{opt}</button>
-										{/each}
-									</div>
+									{#each thinkingGroups as group}
+										<div class="space-y-1">
+											{#if group.label !== '关闭'}
+												<p class="text-[10px] text-muted-foreground">{group.label}</p>
+											{/if}
+											<div class="flex flex-wrap gap-1">
+												{#each group.options as opt}
+													{#if llmThinkingOptions.includes(opt)}
+														<button
+															class="px-2 py-1 text-xs rounded border transition-colors {llmConfig.google_thinking === opt ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:bg-accent'}"
+															onclick={() => { if (llmConfig) llmConfig.google_thinking = opt; }}
+														>{thinkingLabels[opt] || opt}</button>
+													{/if}
+												{/each}
+											</div>
+										</div>
+									{/each}
 								</div>
 							{:else if llmConfig.provider === 'custom'}
 								<div class="space-y-1.5">
