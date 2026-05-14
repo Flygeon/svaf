@@ -23,6 +23,14 @@
 
 	let llmText = $state('');
 	let llmVisible = $state(false);
+	let llmContainer: HTMLPreElement | undefined = $state();
+
+	$effect(() => {
+		if (llmText && llmContainer) {
+			llmContainer.scrollTop = llmContainer.scrollHeight;
+		}
+	});
+
 	let progressNode = $state('');
 	let progressValue = $state(0);
 	let progressMax = $state(0);
@@ -171,7 +179,7 @@
 						<Icon icon="mdi:loading" class="size-3 animate-spin" />
 					{/if}
 				</div>
-				<pre class="text-xs bg-yellow-50 dark:bg-yellow-950/30 border rounded-md p-2 max-h-40 overflow-y-auto whitespace-pre-wrap">{llmText}</pre>
+				<pre bind:this={llmContainer} class="text-xs bg-yellow-50 dark:bg-yellow-950/30 border rounded-md p-2 max-h-40 overflow-y-auto whitespace-pre-wrap">{llmText}</pre>
 			</div>
 		{/if}
 
