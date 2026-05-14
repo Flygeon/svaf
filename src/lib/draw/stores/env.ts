@@ -112,6 +112,7 @@ export async function resolveApiRedirect(): Promise<void> {
 	if (_redirectResolved) return;
 	_redirectResolved = true;
 	const baseUrl = get(drawEnv.baseUrl);
+	console.log(`当前API：${baseUrl}`);
 	try {
 		const resp = await fetch(baseUrl, { method: 'HEAD', redirect: 'manual' });
 		if (resp.status >= 300 && resp.status < 400) {
@@ -119,11 +120,17 @@ export async function resolveApiRedirect(): Promise<void> {
 			if (location) {
 				const resolved = new URL(location, baseUrl).toString().replace(/\/+$/, '');
 				if (resolved !== baseUrl) {
+					console.log(`检查重定向：有，目标：${resolved}`);
 					drawEnv.customBaseUrl.set(resolved);
+					console.log('API可用性：✅');
+					return;
 				}
 			}
 		}
+		console.log('检查重定向：无，锁定API');
+		console.log('API可用性：✅');
 	} catch {
-		// 忽略错误，继续使用原地址
+		console.log('检查重定向：失败，保留原地址');
+		console.log('API可用性：✅（使用原地址）');
 	}
 }
