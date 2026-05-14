@@ -385,6 +385,11 @@
 		{:else if globalBusy}
 			<Icon icon="mdi:loading" class="size-4 animate-spin" />
 			他人生图中...
+				{#if otherStage === 'llm'}
+					<span class="text-[10px] opacity-70">(LLM处理)</span>
+				{:else if otherMax > 0}
+					<span class="text-[10px] opacity-70">({Math.round(otherValue / otherMax * 100)}%)</span>
+				{/if}
 		{:else}
 			<Icon icon="mdi:play" class="size-4" />
 			开始生成
