@@ -183,7 +183,7 @@
 					LLM 处理中...
 					<Icon icon="mdi:loading" class="size-3 animate-spin" />
 				</div>
-				<pre bind:this={llmContainer} class="text-xs bg-yellow-50 dark:bg-yellow-950/30 border rounded-md p-2 max-h-40 overflow-y-auto whitespace-pre-wrap">{llmText}</pre>
+				<pre bind:this={llmContainer} class="text-xs bg-yellow-50 dark:bg-yellow-950/30 border rounded-md p-2 max-h-40 overflow-y-auto whitespace-pre-wrap resize-y">{llmText}</pre>
 			</div>
 		{/if}
 
@@ -205,7 +205,7 @@
 				<summary class="cursor-pointer text-muted-foreground hover:text-foreground">
 					日志 ({logLines.length})
 				</summary>
-				<pre class="mt-1 bg-muted rounded-md p-2 max-h-32 overflow-y-auto whitespace-pre-wrap">{logLines.join('\n')}</pre>
+				<pre class="mt-1 bg-muted rounded-md p-2 max-h-32 overflow-y-auto whitespace-pre-wrap resize-y">{logLines.join('\n')}</pre>
 			</details>
 		{/if}
 	</div>

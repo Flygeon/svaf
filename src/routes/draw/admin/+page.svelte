@@ -832,7 +832,7 @@
 								bind:value={maintenance.message}
 								rows={4}
 								placeholder="站点维护中，请稍后再试..."
-								class="w-full rounded-md border bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+								class="w-full rounded-md border bg-background px-3 py-2 text-sm resize-y focus:outline-none focus:ring-2 focus:ring-ring"
 							></textarea>
 						</div>
 						<Button onclick={saveMaintenance} disabled={loading}>
@@ -871,7 +871,7 @@
 								bind:value={announcement.content}
 								rows={4}
 								placeholder="公告内容..."
-								class="w-full rounded-md border bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+								class="w-full rounded-md border bg-background px-3 py-2 text-sm resize-y focus:outline-none focus:ring-2 focus:ring-ring"
 							></textarea>
 						</div>
 						<Button onclick={saveAnnouncement} disabled={loading}>
