@@ -68,6 +68,8 @@
 				if (p.width) width = p.width;
 				if (p.height) height = p.height;
 				if (p.safetyRating) safetyRating = p.safetyRating;
+					if (p.forkSeed !== undefined) forkSeed = p.forkSeed;
+					if (p.sameSeed !== undefined) sameSeed = p.sameSeed;
 			}
 		} catch {}
 	}
@@ -136,7 +138,7 @@
 	// Persist form state to localStorage
 	$effect(() => {
 		if (typeof localStorage === 'undefined') return;
-		const state = { workflowPath, workflowName, styleTags, styleName, directPrompt, negativePrompt, nlPrompt, rewrite, width, height, safetyRating };
+		const state = { workflowPath, workflowName, styleTags, styleName, directPrompt, negativePrompt, nlPrompt, rewrite, width, height, safetyRating, forkSeed, sameSeed };
 		localStorage.setItem('draw-form', JSON.stringify(state));
 	});
 

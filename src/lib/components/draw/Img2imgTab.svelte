@@ -182,18 +182,11 @@
 		saveState();
 	}
 
-	function handlePromptInput(e: Event) {
+function handlePromptInput(e: Event) {
 		const el = e.target as HTMLTextAreaElement;
 		prompt = el.value;
-		if (typeof localStorage === 'undefined') return;
-		try {
-			const saved = localStorage.getItem(STORAGE_KEY);
-			const parsed = saved ? JSON.parse(saved) : {};
-			parsed.prompt = prompt;
-			localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
-		} catch {}
+		saveState();
 	}
-
 	async function doUpload(): Promise<{ image1_name: string; image2_name: string }> {
 		const token = forumAuth.getToken()!;
 		const form = new FormData();
