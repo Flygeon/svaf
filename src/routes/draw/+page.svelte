@@ -705,8 +705,6 @@ import QwenTab from '$lib/components/draw/QwenTab.svelte';
 														alt={item.path}
 														loading="lazy"
 														decoding="async"
-														style="aspect-ratio: 1;"
-														onload={handleImgLoad}
 														class="block w-full h-auto bg-muted"
 													/>
 												{#if selectMode}
