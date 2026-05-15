@@ -495,8 +495,8 @@ import QwenTab from '$lib/components/draw/QwenTab.svelte';
 				<TabsContent value="img2img" class="mt-4">
 					<Tabs bind:value={img2imgSubTab} class="w-full">
 						<TabsList class="w-full">
-							<TabsTrigger value="flux2" class="flex-1">Flux2</TabsTrigger>
-							<TabsTrigger value="qwen" class="flex-1">Qwen</TabsTrigger>
+							<TabsTrigger value="flux2" class="flex-1">Flux2（AI换装换脸）</TabsTrigger>
+							<TabsTrigger value="qwen" class="flex-1">Qwen（NSFW）</TabsTrigger>
 						</TabsList>
 						<TabsContent value="flux2" class="mt-4">
 							<Img2imgTab {globalBusy} bind:otherNode bind:otherValue bind:otherMax bind:otherStage />
