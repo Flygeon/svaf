@@ -336,7 +336,9 @@
 					}
 				}
 				prevQueueIds = prevActive;
-				myQueueItems = showItems;
+				// 只有数据变化时才更新，避免闪烁
+				const same = myQueueItems.length === showItems.length && myQueueItems.every((old, i) => old.id === showItems[i].id && old.status === showItems[i].status);
+				if (!same) myQueueItems = showItems;
 		} catch {
 			myQueueItems = [];
 		} finally {
