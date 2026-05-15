@@ -30,6 +30,7 @@
 	let onlineCount = $state(0);
 	let queuing = $state(false);
 	let queueSuccess = $state("");
+	let queueTimer: ReturnType<typeof setInterval> | null = null;
 	let globalBusy = $state(false);
 	
 	let authToken = $state<string | null>(null);
@@ -146,9 +147,13 @@
 		if (activeTab === 'mine' && isLoggedIn) {
 			if (!myImagesLoaded) loadMyImages();
 			loadMyQueue();
+			queueTimer = setInterval(loadMyQueue, 1000);
 			if ('Notification' in window && Notification.permission === 'default') { Notification.requestPermission(); }
-				if (!myRecsLoaded) loadMyRecommendations();
+			if (!myRecsLoaded) loadMyRecommendations();
+		} else {
+			if (queueTimer) { clearInterval(queueTimer); queueTimer = null; }
 		}
+		return () => { if (queueTimer) { clearInterval(queueTimer); queueTimer = null; } };
 	});
 
 	$effect(() => {
