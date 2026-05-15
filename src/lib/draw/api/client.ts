@@ -160,6 +160,18 @@ export async function deleteMyImage(path: string) {
 	});
 }
 
+export async function addToQueue(payload: {
+	direct_prompt: string;
+	image1_name?: string;
+	image2_name?: string;
+}) {
+	return drawRequest<{ queued: boolean; position: number }>('/api/draw/queue', {
+		method: 'POST',
+		json: payload,
+		requiresAuth: true,
+	});
+}
+
 export async function recommendImage(imagePath: string, reason?: string) {
 	return drawRequest<{ ok: boolean; recommendation: DrawRecommendation }>('/api/draw/recommend', {
 		method: 'POST',

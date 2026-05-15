@@ -9,7 +9,7 @@
 	import { forumAuth } from '$lib/forum/stores/auth';
 	import { drawEnv, apiError, apiStatus, resolveApiRedirect } from '$lib/draw/stores/env';
 	import { connectRunWs, connectStatusWs } from '$lib/draw/api/ws';
-	import { fetchMyImages, getImageUrl, getImageProxyUrl, forkOutputImage, recommendImage, deleteMyImage, fetchMyRecommendations } from '$lib/draw/api/client';
+	import { fetchMyImages, getImageUrl, getImageProxyUrl, forkOutputImage, recommendImage, deleteMyImage, fetchMyRecommendations, addToQueue } from '$lib/draw/api/client';
 	import { consumeFork } from '$lib/draw/stores/fork';
 	import { onMount, onDestroy } from 'svelte';
 	import type { WsRunMessage, WsStatusEvent, WsRunPayload, DrawWorkflow, DrawRecommendation } from '$lib/draw/types';
@@ -79,6 +79,11 @@
 	let showProgress = $state(false);
 	let resultImages = $state<{ url: string; filename: string }[]>([]);
 	let genCost = $state(0);
+
+	// Queue dialog state
+	let showQueueDialog = $state(false);
+	let pendingPayload: WsRunPayload | null = null;
+	let queueError = $state('');
 
 	// My images state
 	let myImages = $state<{ path: string; mtime: number }[]>([]);
@@ -250,7 +255,7 @@
 	}
 
 	function startGeneration() {
-		if (isGenerating || globalBusy) return;
+		if (isGenerating) return;
 		if (!authToken) {
 			alert('请先在论坛登录');
 			return;
@@ -259,12 +264,6 @@
 			alert('请选择工作流');
 			return;
 		}
-
-		isGenerating = true;
-		progressMessages = [];
-		resultImages = [];
-		genCost = 0;
-		showProgress = true;
 
 		const ratingTag = `rating:${safetyRating}`;
 		const finalDirectPrompt = directPrompt
@@ -285,6 +284,24 @@
 			seed: sameSeed ? forkSeed : undefined
 		};
 
+		// If system is busy, show queue dialog
+		if (globalBusy) {
+			pendingPayload = payload;
+			showQueueDialog = true;
+			return;
+		}
+
+		// Start real-time generation
+		runWsGeneration(payload);
+	}
+
+	function runWsGeneration(payload: WsRunPayload) {
+		isGenerating = true;
+		progressMessages = [];
+		resultImages = [];
+		genCost = 0;
+		showProgress = true;
+
 		runWs = connectRunWs(
 			currentBaseUrl,
 			payload,
@@ -297,6 +314,22 @@
 				isGenerating = false;
 			}
 		);
+	}
+
+	async function confirmQueue() {
+		showQueueDialog = false;
+		if (!pendingPayload) return;
+
+		try {
+			await addToQueue({
+				direct_prompt: pendingPayload.direct_prompt,
+			});
+			queueError = '';
+			alert('已加入队列，生成完成后可前往"我的"页面查看');
+		} catch (e) {
+			queueError = e instanceof Error ? e.message : '加入队列失败';
+		}
+		pendingPayload = null;
 	}
 
 	function handleRunMessage(msg: WsRunMessage) {
@@ -562,7 +595,7 @@
 						bind:height
 						bind:safetyRating
 						onsubmit={startGeneration}
-						disabled={isGenerating || globalBusy || !isLoggedIn}
+						disabled={isGenerating || !isLoggedIn}
 						busy={globalBusy && !isGenerating}
 						bind:otherNode
 						bind:otherValue
@@ -580,6 +613,28 @@
 						cost={genCost}
 						onFork={handleFork}
 					/>
+
+					<!-- Queue Confirmation Dialog -->
+					<Dialog.Root open={showQueueDialog} onOpenChange={(v) => { showQueueDialog = v; }}>
+						<Dialog.Content>
+							<Dialog.Header>
+								<Dialog.Title>加入队列</Dialog.Title>
+							</Dialog.Header>
+							<div class="text-sm text-muted-foreground">
+								当前已有用户正在生图，是否加入队列？等待生图结束后可前往"我的"页面查看。
+							</div>
+							{#if queueError}
+								<Alert variant="destructive" class="mt-2">
+									<Icon icon="mdi:alert-circle" class="size-4" />
+									<AlertDescription class="text-xs">{queueError}</AlertDescription>
+								</Alert>
+							{/if}
+							<Dialog.Footer>
+								<Button variant="outline" onclick={() => { showQueueDialog = false; pendingPayload = null; }}>取消</Button>
+								<Button onclick={confirmQueue}>加入队列</Button>
+							</Dialog.Footer>
+						</Dialog.Content>
+					</Dialog.Root>
 				</TabsContent>
 
 				<TabsContent value="img2img" class="mt-4">

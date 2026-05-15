@@ -212,13 +212,8 @@
 		{disabled}
 	>
 		{#if busy}
-			<Icon icon="mdi:loading" class="size-4 animate-spin" />
-			他人生图中...
-			{#if otherStage === 'llm'}
-				<span class="text-[10px] opacity-70">(LLM处理)</span>
-			{:else if otherMax > 0}
-				<span class="text-[10px] opacity-70">({Math.round(otherValue / otherMax * 100)}%)</span>
-			{/if}
+			<Icon icon="mdi:queue-timeline" class="size-4" />
+			他人生图中，点击加入队列
 		{:else}
 			<Icon icon="mdi:sparkles" class="size-5 mr-1.5" />
 			开始生成

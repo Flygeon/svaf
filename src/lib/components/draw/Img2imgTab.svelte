@@ -3,9 +3,11 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import { Badge } from '$lib/components/ui/badge';
+	import * as Dialog from '$lib/components/ui/dialog';
 	import { forumAuth } from '$lib/forum/stores/auth';
 	import { drawEnv, apiError } from '$lib/draw/stores/env';
 	import { connectRunWs } from '$lib/draw/api/ws';
+	import { addToQueue } from '$lib/draw/api/client';
 	import { get } from 'svelte/store';
 	import ProgressPanel from './ProgressPanel.svelte';
 	import type { WsRunMessage } from '$lib/draw/types';
@@ -36,7 +38,33 @@
 	let dragOverIndex = $state<number | null>(null);
 	let prompt = $state('');
 	let uploading = $state(false);
+	let uploadProgress = $state(0);
 	let error = $state('');
+
+	// Queue dialog state
+	let showQueueDialog = $state(false);
+	let pendingUploadNames: { image1_name: string; image2_name: string } | null = null;
+
+	function uploadFileWithProgress(url: string, headers: Headers, form: FormData, onProgress: (pct: number) => void): Promise<Response> {
+		return new Promise((resolve, reject) => {
+			const xhr = new XMLHttpRequest();
+			xhr.open('POST', url);
+			headers.forEach((value, key) => xhr.setRequestHeader(key, value));
+			xhr.upload.onprogress = (e) => {
+				if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
+			};
+			xhr.onload = () => {
+				const headers = new Headers();
+				xhr.getAllResponseHeaders().split('\r\n').forEach(line => {
+					const [k, ...v] = line.split(': ');
+					if (k) headers.set(k, v.join(': '));
+				});
+				resolve(new Response(xhr.responseText, { status: xhr.status, headers }));
+			};
+			xhr.onerror = () => reject(new Error('上传失败'));
+			xhr.send(form);
+		});
+	}
 
 	function handleDragStart(i: number) {
 		dragIndex = i;
@@ -211,6 +239,28 @@
 		}
 	}
 
+	async function doUpload(): Promise<{ image1_name: string; image2_name: string }> {
+		const token = forumAuth.getToken()!;
+		const form = new FormData();
+		form.append('image1', images[0].file);
+		if (images.length > 1) form.append('image2', images[1].file);
+
+		const baseUrl = get(drawEnv.baseUrl);
+		const headers = new Headers();
+		headers.set('Authorization', `Bearer ${token}`);
+
+		const uploadResp = await uploadFileWithProgress(`${baseUrl}/api/img2img/upload`, headers, form, (pct) => {
+			uploadProgress = pct;
+		});
+
+		if (!uploadResp.ok) {
+			const body = await uploadResp.json().catch(() => ({ message: uploadResp.statusText }));
+			throw new Error(body.message || body.detail || '上传失败');
+		}
+
+		return await uploadResp.json();
+	}
+
 	async function startGeneration() {
 		if (isGenerating || uploading || images.length === 0) return;
 
@@ -226,52 +276,67 @@
 
 		error = '';
 		uploading = true;
+		uploadProgress = 0;
 
 		try {
-			// 1. Upload images to get ComfyUI filenames
-			const form = new FormData();
-			form.append('image1', images[0].file);
-			if (images.length > 1) form.append('image2', images[1].file);
-
-			const baseUrl = get(drawEnv.baseUrl);
-			const uploadResp = await fetch(`${baseUrl}/api/img2img/upload`, {
-				method: 'POST',
-				headers: { 'Authorization': `Bearer ${token}` },
-				body: form,
-			});
-
-			if (!uploadResp.ok) {
-				const body = await uploadResp.json().catch(() => ({ message: uploadResp.statusText }));
-				throw new Error(body.message || body.detail || '上传失败');
-			}
-
-			const uploadData = await uploadResp.json();
+			const uploadData = await doUpload();
 			uploading = false;
 
-			// 2. Connect WebSocket for real-time progress
-			isGenerating = true;
-			progressMessages = [];
-			resultImages = [];
-			genCost = 0;
-			showProgress = true;
+			// If system is busy, show queue dialog
+			if (globalBusy) {
+				pendingUploadNames = uploadData;
+				showQueueDialog = true;
+				return;
+			}
 
-			runWs = connectRunWs(
-				baseUrl,
-				{
-					token,
-					direct_prompt: prompt.trim(),
-					image1_name: uploadData.image1_name,
-					image2_name: uploadData.image2_name || '',
-				},
-				handleRunMessage,
-				undefined,
-				() => { isGenerating = false; },
-				() => { isGenerating = false; },
-			);
+			// Start real-time generation
+			startWsGeneration(token, uploadData);
 		} catch (e) {
 			uploading = false;
 			error = e instanceof Error ? e.message : '生成失败';
 		}
+	}
+
+	function startWsGeneration(token: string, uploadData: { image1_name: string; image2_name: string }) {
+		isGenerating = true;
+		progressMessages = [];
+		resultImages = [];
+		genCost = 0;
+		showProgress = true;
+
+		const baseUrl = get(drawEnv.baseUrl);
+		runWs = connectRunWs(
+			baseUrl,
+			{
+				token,
+				direct_prompt: prompt.trim(),
+				image1_name: uploadData.image1_name,
+				image2_name: uploadData.image2_name || '',
+			},
+			handleRunMessage,
+			undefined,
+			() => { isGenerating = false; },
+			() => { isGenerating = false; },
+		);
+	}
+
+	async function confirmQueue() {
+		showQueueDialog = false;
+		const token = forumAuth.getToken();
+		if (!token || !pendingUploadNames) return;
+
+		try {
+			await addToQueue({
+				direct_prompt: prompt.trim(),
+				image1_name: pendingUploadNames.image1_name,
+				image2_name: pendingUploadNames.image2_name || '',
+			});
+			error = '';
+			alert('已加入队列，生成完成后可前往"我的"页面查看');
+		} catch (e) {
+			error = e instanceof Error ? e.message : '加入队列失败';
+		}
+		pendingUploadNames = null;
 	}
 </script>
 
@@ -374,22 +439,17 @@
 	<Button
 		class="w-full gap-2"
 		onclick={startGeneration}
-		disabled={!isLoggedIn || isGenerating || uploading || globalBusy || images.length === 0}
+		disabled={!isLoggedIn || isGenerating || uploading || images.length === 0}
 	>
 		{#if uploading}
 			<Icon icon="mdi:loading" class="size-4 animate-spin" />
-			上传中...
+			上传中 {uploadProgress}%
 		{:else if isGenerating}
 			<Icon icon="mdi:loading" class="size-4 animate-spin" />
 			生成中...
 		{:else if globalBusy}
-			<Icon icon="mdi:loading" class="size-4 animate-spin" />
-			他人生图中...
-				{#if otherStage === 'llm'}
-					<span class="text-[10px] opacity-70">(LLM处理)</span>
-				{:else if otherMax > 0}
-					<span class="text-[10px] opacity-70">({Math.round(otherValue / otherMax * 100)}%)</span>
-				{/if}
+			<Icon icon="mdi:queue-timeline" class="size-4" />
+			他人生图中，点击加入队列
 		{:else}
 			<Icon icon="mdi:play" class="size-4" />
 			开始生成
@@ -412,4 +472,20 @@
 		resultImages={resultImages}
 		cost={genCost}
 	/>
+
+	<!-- Queue Confirmation Dialog -->
+	<Dialog.Root open={showQueueDialog} onOpenChange={(v) => { showQueueDialog = v; }}>
+		<Dialog.Content>
+			<Dialog.Header>
+				<Dialog.Title>加入队列</Dialog.Title>
+			</Dialog.Header>
+			<div class="text-sm text-muted-foreground">
+				当前已有用户正在生图，是否加入队列？等待生图结束后可前往"我的"页面查看。
+			</div>
+			<Dialog.Footer>
+				<Button variant="outline" onclick={() => { showQueueDialog = false; pendingUploadNames = null; }}>取消</Button>
+				<Button onclick={confirmQueue}>加入队列</Button>
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
 </div>
