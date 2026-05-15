@@ -11,6 +11,7 @@
 	import { connectRunWs, connectStatusWs } from '$lib/draw/api/ws';
 	import { fetchMyImages, getImageUrl, getImageProxyUrl, forkOutputImage, recommendImage, deleteMyImage, fetchMyRecommendations } from '$lib/draw/api/client';
 	import { consumeFork } from '$lib/draw/stores/fork';
+	import { onMount, onDestroy } from 'svelte';
 	import type { WsRunMessage, WsStatusEvent, WsRunPayload, DrawWorkflow, DrawRecommendation } from '$lib/draw/types';
 
 	import PageViews from '$lib/components/PageViews.svelte';
@@ -85,6 +86,14 @@ import QwenTab from '$lib/components/draw/QwenTab.svelte';
 	let myImagesTotal = $state(0);
 	let myImagesLoading = $state(false);
 	let myImagesLoaded = $state(false);
+	// Masonry layout
+	let columnCount = $state(4);
+	let imgColumns = $state<string[][]>([[], [], [], []]);
+	let columnHeights: number[] = [0, 0, 0, 0];
+	let sentinelEl: HTMLDivElement | undefined;
+	let io: IntersectionObserver | null = null;
+	let hasMore = $state(true);
+	let loadingMore = $state(false);
 
 	// My images lightbox
 	let myLbOpen = $state(false);
@@ -317,10 +326,70 @@ import QwenTab from '$lib/components/draw/QwenTab.svelte';
 			myImages = res.items;
 			myImagesTotal = res.total;
 			myImagesLoaded = true;
+			columnCount = getColumnCount();
+			imgColumns = Array.from({ length: columnCount }, () => []);
+			columnHeights = new Array(columnCount).fill(0);
+			for (const item of res.items) pushToShortest(item.path);
+			imgColumns = [...imgColumns];
+			hasMore = false;
 		} catch {
 			myImages = [];
 		} finally {
 			myImagesLoading = false;
+		}
+	}
+
+	function getColumnCount(): number {
+		if (typeof window === 'undefined') return 4;
+		const w = window.innerWidth;
+		if (w >= 1400) return 6;
+		if (w >= 1024) return 5;
+		if (w >= 768) return 4;
+		if (w >= 480) return 3;
+		return 2;
+	}
+
+	function pushToShortest(path: string) {
+		let minIdx = 0;
+		for (let i = 1; i < columnHeights.length; i++) {
+			if (columnHeights[i] < columnHeights[minIdx]) minIdx = i;
+		}
+		imgColumns[minIdx] = [...imgColumns[minIdx], path];
+		columnHeights[minIdx] += 1;
+	}
+
+	function rebuildColumns() {
+		const flat: string[] = [];
+		const idx = new Array(imgColumns.length).fill(0);
+		while (true) {
+			let added = false;
+			for (let c = 0; c < imgColumns.length; c++) {
+				if (idx[c] < imgColumns[c].length) {
+					flat.push(imgColumns[c][idx[c]++]);
+					added = true;
+				}
+			}
+			if (!added) break;
+		}
+		columnCount = getColumnCount();
+		imgColumns = Array.from({ length: columnCount }, () => []);
+		columnHeights = new Array(columnCount).fill(0);
+		for (const p of flat) pushToShortest(p);
+		imgColumns = [...imgColumns];
+	}
+
+	function handleResize() {
+		const old = columnCount;
+		const nu = getColumnCount();
+		if (nu === old) return;
+		columnCount = nu;
+		rebuildColumns();
+	}
+
+	function handleImgLoad(e: Event) {
+		const img = e.currentTarget as HTMLImageElement;
+		if (img.naturalWidth && img.naturalHeight) {
+			img.style.aspectRatio = `${img.naturalWidth / img.naturalHeight}`;
 		}
 	}
 
@@ -341,7 +410,30 @@ import QwenTab from '$lib/components/draw/QwenTab.svelte';
 		selectedPaths = s;
 	}
 
-	async function handleBatchDelete() {
+	onMount(() => {
+		columnCount = getColumnCount();
+		imgColumns = Array.from({ length: columnCount }, () => []);
+		columnHeights = new Array(columnCount).fill(0);
+		if (sentinelEl && !myImagesLoaded) {
+			io = new IntersectionObserver(
+				(entries) => {
+					if (entries.some((e) => e.isIntersecting && !loadingMore && hasMore)) loadMoreMyImages();
+				},
+				{ rootMargin: '400px 0px' }
+			);
+			io.observe(sentinelEl);
+		}
+		window.addEventListener('resize', handleResize, { passive: true });
+	});
+
+	onDestroy(() => {
+		io?.disconnect();
+		if (typeof window !== 'undefined') {
+			window.removeEventListener('resize', handleResize);
+		}
+	});
+
+		async function handleBatchDelete() {
 		if (selectedPaths.size === 0) return;
 		if (!confirm(`确定删除选中的 ${selectedPaths.size} 张图片？`)) return;
 		try {
@@ -598,26 +690,37 @@ import QwenTab from '$lib/components/draw/QwenTab.svelte';
 						{:else if myImages.length === 0}
 							<div class="text-xs text-muted-foreground py-8 text-center">你还没有生成过图片</div>
 						{:else}
-							<div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-1.5">
-								{#each myImages as item, i}
-									<div role="button" tabindex="0"
-										class="group relative aspect-square rounded-md overflow-hidden border hover:ring-2 hover:ring-primary/50 transition-all cursor-pointer"
-										onclick={() => { if (selectMode) toggleSelect(item.path); else { myLbIndex = i; myLbOpen = true; } }}
-									>
-										<img
-											src={getImageProxyUrl(item.path)}
-											alt={item.path}
-											class="w-full h-full object-cover"
-											loading="lazy"
-										/>
-									{#if selectMode}
-											<div class="absolute top-1 left-1 flex items-center justify-center" onclick={(e) => e.stopPropagation()}>
-												<input type="checkbox" checked={selectedPaths.has(item.path)} onchange={() => toggleSelect(item.path)} class="size-4 accent-primary" />
-											</div>
-										{/if}
+							<div class="flex gap-2 items-start">
+								{#each imgColumns as col, ci (ci)}
+									<div class="flex flex-1 flex-col gap-2 min-w-0">
+										{#each col as path (path)}
+											{@const item = myImages.find(i => i.path === path)}
+											{#if item}
+												<div role="button" tabindex="0"
+													class="group relative rounded-md overflow-hidden border hover:ring-2 hover:ring-primary/50 transition-all cursor-pointer"
+													onclick={() => { if (selectMode) toggleSelect(item.path); else { myLbIndex = myImages.indexOf(item); myLbOpen = true; } }}
+												>
+													<img
+														src={getImageProxyUrl(item.path)}
+														alt={item.path}
+														loading="lazy"
+														decoding="async"
+														style="aspect-ratio: 1;"
+														onload={handleImgLoad}
+														class="block w-full h-auto bg-muted"
+													/>
+												{#if selectMode}
+														<div class="absolute top-1 left-1 flex items-center justify-center" onclick={(e) => e.stopPropagation()}>
+															<input type="checkbox" checked={selectedPaths.has(item.path)} onchange={() => toggleSelect(item.path)} class="size-4 accent-primary" />
+														</div>
+												{/if}
+												</div>
+											{/if}
+										{/each}
 									</div>
 								{/each}
 							</div>
+							<div bind:this={sentinelEl} class="h-4"></div>
 						{/if}
 					</div>
 
