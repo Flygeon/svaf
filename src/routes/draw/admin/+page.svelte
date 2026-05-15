@@ -15,7 +15,8 @@
 	import * as admin from '$lib/draw/api/admin';
 	import { getImageProxyUrl, getImageUrl, getThumbnailUrl, forkOutputImage } from '$lib/draw/api/client';
 	import { pendingFork } from '$lib/draw/stores/fork';
-	import ImageLightbox from '$lib/components/draw/ImageLightbox.svelte';
+	import { onMount, onDestroy } from 'svelte';
+import ImageLightbox from '$lib/components/draw/ImageLightbox.svelte';
 	import type {
 		AdminRecentImage,
 		AdminLimits,
@@ -41,6 +42,14 @@
 	let recentLimit = $state(50);
 	let selectedPaths = $state<Set<string>>(new Set());
 	let searchUserId = $state('');
+// Masonry layout
+let columnCount = $state(4);
+let imgColumns = $state<string[][]>([[], [], [], []]);
+let columnHeights: number[] = [0, 0, 0, 0];
+let sentinelEl: HTMLDivElement | undefined;
+let io: IntersectionObserver | null = null;
+let hasMore = $state(true);
+let loadingMore = $state(false);
 
 	// Recommendations
 	let recommendations = $state<DrawRecommendation[]>([]);
@@ -172,6 +181,12 @@
 			recentTotal = res.total;
 			recentOffset = res.items.length;
 			selectedPaths = new Set();
+			columnCount = getColumnCount();
+			imgColumns = Array.from({ length: columnCount }, () => []);
+			columnHeights = new Array(columnCount).fill(0);
+			for (const item of res.items) pushToShortest(item.path);
+			imgColumns = [...imgColumns];
+			hasMore = recentOffset < recentTotal;
 		} catch (e) {
 			showMsg('error', e instanceof Error ? e.message : '加载失败');
 		} finally {
@@ -180,15 +195,19 @@
 	}
 
 	async function loadMoreRecent() {
-		loading = true;
+		if (loadingMore || !hasMore) return;
+		loadingMore = true;
 		try {
 			const res = await admin.getRecentImages(recentLimit, recentOffset);
 			recentImages = [...recentImages, ...res.items];
 			recentOffset += res.items.length;
+			for (const item of res.items) pushToShortest(item.path);
+			imgColumns = [...imgColumns];
+			hasMore = recentOffset < recentTotal;
 		} catch (e) {
 			showMsg('error', e instanceof Error ? e.message : '加载失败');
 		} finally {
-			loading = false;
+			loadingMore = false;
 		}
 	}
 
@@ -200,10 +219,67 @@
 			recentImages = res.items;
 			recentTotal = res.total;
 			selectedPaths = new Set();
+			rebuildColumns();
 		} catch (e) {
 			showMsg('error', e instanceof Error ? e.message : '查询失败');
 		} finally {
 			loading = false;
+		}
+	}
+
+	function getColumnCount(): number {
+		if (typeof window === 'undefined') return 4;
+		const w = window.innerWidth;
+		if (w >= 1400) return 6;
+		if (w >= 1024) return 5;
+		if (w >= 768) return 4;
+		if (w >= 480) return 3;
+		return 2;
+	}
+
+	function pushToShortest(path: string) {
+		let minIdx = 0;
+		for (let i = 1; i < columnHeights.length; i++) {
+			if (columnHeights[i] < columnHeights[minIdx]) minIdx = i;
+		}
+		imgColumns[minIdx] = [...imgColumns[minIdx], path];
+		columnHeights[minIdx] += 1;
+	}
+
+	function rebuildColumns() {
+		const flat: string[] = [];
+		while (true) {
+			let added = false;
+			for (let c = 0; c < imgColumns.length; c++) {
+				if (flat.length < recentImages.length) {
+					for (let j = c; j < recentImages.length; j += imgColumns.length) {
+						flat.push(recentImages[j].path);
+					}
+					added = true;
+					break;
+				}
+			}
+			if (!added) break;
+		}
+		columnCount = getColumnCount();
+		imgColumns = Array.from({ length: columnCount }, () => []);
+		columnHeights = new Array(columnCount).fill(0);
+		for (const p of flat) pushToShortest(p);
+		imgColumns = [...imgColumns];
+	}
+
+	function handleResize() {
+		const old = columnCount;
+		const nu = getColumnCount();
+		if (nu === old) return;
+		columnCount = nu;
+		rebuildColumns();
+	}
+
+	function handleImgLoad(e: Event) {
+		const img = e.currentTarget as HTMLImageElement;
+		if (img.naturalWidth && img.naturalHeight) {
+			img.style.aspectRatio = `${img.naturalWidth / img.naturalHeight}`;
 		}
 	}
 
@@ -711,7 +787,30 @@
 		}
 	});
 
-	function formatTime(ts: number) {
+	onMount(() => {
+	columnCount = getColumnCount();
+	imgColumns = Array.from({ length: columnCount }, () => []);
+	columnHeights = new Array(columnCount).fill(0);
+	if (sentinelEl) {
+		io = new IntersectionObserver(
+			(entries) => {
+				if (entries.some((e) => e.isIntersecting && !loadingMore && hasMore)) loadMoreRecent();
+			},
+			{ rootMargin: '400px 0px' }
+		);
+		io.observe(sentinelEl);
+	}
+	window.addEventListener('resize', handleResize, { passive: true });
+});
+
+onDestroy(() => {
+	io?.disconnect();
+	if (typeof window !== 'undefined') {
+		window.removeEventListener('resize', handleResize);
+	}
+});
+
+function formatTime(ts: number) {
 		return new Date(ts * 1000).toLocaleString('zh-CN');
 	}
 </script>
@@ -851,53 +950,59 @@
 						</div>
 					</CardContent>
 				</Card>
-
 				{#if recentImages.length > 0}
-					<div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-						{#each recentImages as img}
-							<div class="relative group">
-								<button
-									class="aspect-square rounded-md overflow-hidden border w-full {selectedPaths.has(img.path) ? 'ring-2 ring-primary' : ''}"
-									onclick={() => openLb(img.path)}
-								>
-									<img
-										src={getImageProxyUrl(img.path)}
-										alt={img.path}
-										class="w-full h-full object-cover"
-										loading="lazy"
-									/>
-								</button>
-								<div class="absolute top-1 left-1">
-									<input
-										type="checkbox"
-										checked={selectedPaths.has(img.path)}
-										onchange={() => toggleSelect(img.path)}
-										onclick={(e) => e.stopPropagation()}
-										class="size-4 accent-primary opacity-60 group-hover:opacity-100 transition-opacity"
-									/>
-								</div>
-								<div class="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-									<button
-										class="p-0.5 rounded bg-destructive/80 text-white hover:bg-destructive"
-										onclick={(e) => { e.stopPropagation(); handleDeleteOne(img.path); }}
-										title="删除"
-									>
-										<Icon icon="mdi:delete" class="size-3.5" />
-									</button>
-								</div>
-								<div class="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[10px] px-1 py-0.5 truncate">
-									{img.user_id || '?'} | {formatTime(img.mtime)}
-								</div>
+					<div class="flex gap-2 items-start">
+						{#each imgColumns as col, ci (ci)}
+							<div class="flex flex-1 flex-col gap-2 min-w-0">
+								{#each col as path (path)}
+									{@const img = recentImages.find(i => i.path === path)}
+									{#if img}
+										<div class="relative group">
+											<button
+												class="w-full rounded-md overflow-hidden border {selectedPaths.has(img.path) ? 'ring-2 ring-primary' : ''}"
+												onclick={() => openLb(img.path)}
+											>
+												<img
+													src={getImageProxyUrl(img.path)}
+													alt={img.path}
+													loading="lazy"
+													decoding="async"
+													style="aspect-ratio: 1;"
+													onload={handleImgLoad}
+													class="block w-full h-auto bg-muted"
+												/>
+											</button>
+											<div class="absolute top-1 left-1">
+												<input
+													type="checkbox"
+													checked={selectedPaths.has(img.path)}
+													onchange={() => toggleSelect(img.path)}
+													onclick={(e) => e.stopPropagation()}
+													class="size-4 accent-primary opacity-60 group-hover:opacity-100 transition-opacity"
+												/>
+											</div>
+											<div class="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+												<button
+													class="p-0.5 rounded bg-destructive/80 text-white hover:bg-destructive"
+													onclick={(e) => { e.stopPropagation(); handleDeleteOne(img.path); }}
+													title="删除"
+												>
+													<Icon icon="mdi:delete" class="size-3.5" />
+												</button>
+											</div>
+											<div class="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[10px] px-1 py-0.5 truncate pointer-events-none">
+												{img.user_id || '?'}
+											</div>
+										</div>
+									{/if}
+								{/each}
 							</div>
 						{/each}
 					</div>
-					{#if recentOffset < recentTotal}
-						<div class="text-center">
-							<Button variant="outline" size="sm" onclick={loadMoreRecent} disabled={loading}>
-								加载更多
-							</Button>
-						</div>
+					{#if !hasMore && recentImages.length > 0}
+						<div class="text-center text-xs text-muted-foreground py-2">已加载全部</div>
 					{/if}
+					<div bind:this={sentinelEl} class="h-4"></div>
 				{/if}
 			</TabsContent>
 
