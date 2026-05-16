@@ -319,7 +319,7 @@
 	}
 
 	async function loadMyQueue() {
-		myQueueLoading = true;
+		if (!queueLoaded) myQueueLoading = true;
 		try {
 			const res = await fetchMyQueue();
 			const now = res.items;
@@ -347,7 +347,7 @@
 		} catch {
 			myQueueItems = [];
 		} finally {
-			myQueueLoading = false;
+			if (!queueLoaded) { myQueueLoading = false; queueLoaded = true; }
 		}
 	}
 
