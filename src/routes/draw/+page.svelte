@@ -534,7 +534,7 @@ async function startGeneration() {
 		if (!confirm(`确定删除选中的 ${selectedPaths.size} 张图片？`)) return;
 		try {
 			await Promise.all(Array.from(selectedPaths).map(p => deleteMyImage(p)));
-			myImages = myImages.filter(i => !selectedPaths.has(i.path));
+				myImages = myImages.filter(i => !selectedPaths.has(i.path));
 			selectMode = false;
 			selectedPaths = new Set();
 		} catch (e) {
