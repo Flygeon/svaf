@@ -85,6 +85,7 @@ let loadingMore = $state(false);
 	let nomImgColumns = $state<string[][]>([]);
 	let nomImgHeights: number[] = [];
 	let nomRejectReasons = $state<Record<string, string>>({});
+		let nomDialogItem = $state<any>(null);
 
 	function fmtBanDate(ts: number): string {
 		const d = new Date((ts || 0) * 1000);
@@ -1521,6 +1522,34 @@ function formatTime(ts: number) {
 					</CardContent>
 				</Card>
 			</TabsContent>
+
+			{#if nomDialogItem}
+				<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/90" onclick={() => nomDialogItem = null} role="dialog">
+					<div class="relative flex flex-col items-center max-w-[90vw] max-h-[90vh]" onclick={(e) => e.stopPropagation()}>
+						<button class="absolute top-2 right-2 z-10 text-white/80 hover:text-white" onclick={() => nomDialogItem = null}>
+							<Icon icon="mdi:close" class="size-8" />
+						</button>
+						<img src={getImageUrl(nomDialogItem.path)} alt="" class="max-w-full max-h-[75vh] object-contain rounded-lg" />
+						<div class="flex items-center gap-3 mt-4 bg-background/80 backdrop-blur rounded-lg px-4 py-3">
+							<div class="text-xs text-muted-foreground mr-2">
+								UID {nomDialogItem.nomination.collaborator_id} | {nomDialogItem.nomination.image_paths.length} 张 | {new Date(nomDialogItem.nomination.submitted_at * 1000).toLocaleString()}
+							</div>
+							{#if nomDialogItem.nomination.note}
+								<div class="text-xs text-muted-foreground">备注: {nomDialogItem.nomination.note}</div>
+							{/if}
+							<Button size="sm" variant="default" onclick={() => { handleNominationResolve(nomDialogItem.nomination.id, 'approve'); nomDialogItem = null; }} disabled={loading}>
+								<Icon icon="mdi:check" class="size-4 mr-1" />通过
+							</Button>
+							<Input bind:value={nomRejectReasons[nomDialogItem.nomination.id]}
+								placeholder="拒绝理由" class="h-8 text-xs w-40"
+							/>
+							<Button size="sm" variant="destructive" onclick={() => { handleNominationResolve(nomDialogItem.nomination.id, 'reject'); nomDialogItem = null; }} disabled={loading}>
+								<Icon icon="mdi:close" class="size-4 mr-1" />拒绝
+							</Button>
+						</div>
+					</div>
+				</div>
+			{/if}
 
 			<!-- Limits -->
 			<TabsContent value="limits" class="mt-4">
