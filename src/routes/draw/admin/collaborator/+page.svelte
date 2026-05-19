@@ -34,11 +34,6 @@
 	let imgColumns = $state<string[][]>([[], [], [], []]);
 	let columnHeights: number[] = [0, 0, 0, 0];
 
-	// Recommendations tab
-	let pendingRecs = $state<any[]>([]);
-	let recsLoaded = $state(false);
-	let selectedRecPaths = $state<Set<string>>(new Set());
-
 	// Nominations tab
 	let myNominations = $state<any[]>([]);
 	let nominationsLoaded = $state(false);
@@ -117,7 +112,7 @@
 			hasMore = imagesOffset < imagesTotal;
 			rebuildColumns();
 		} catch (e) {
-			showMsg('error', e instanceof Error ? e.message : '加载失败');
+			console.error('collab loadImages error:', e); showMsg('error', e instanceof Error ? e.message : '加载失败');
 		} finally {
 			imagesLoading = false;
 		}
@@ -138,17 +133,6 @@
 			showMsg('error', e instanceof Error ? e.message : '加载失败');
 		} finally {
 			loadingMore = false;
-		}
-	}
-
-	async function loadRecommendations() {
-		if (recsLoaded) return;
-		try {
-			const res = await collab.getPendingRecommendations();
-			pendingRecs = res.items;
-			recsLoaded = true;
-		} catch (e) {
-			showMsg('error', e instanceof Error ? e.message : '加载失败');
 		}
 	}
 
@@ -196,7 +180,6 @@
 		if (!authToken) return;
 		switch (tab) {
 			case 'images': loadImages(); break;
-			case 'recommendations': loadRecommendations(); break;
 			case 'nominations': loadMyNominations(); break;
 		}
 	});
@@ -257,9 +240,7 @@
 				<TabsTrigger value="images" class="flex-1">
 					<Icon icon="mdi:image-multiple-outline" class="size-4 mr-1" />图片
 				</TabsTrigger>
-				<TabsTrigger value="recommendations" class="flex-1">
-					<Icon icon="mdi:star-plus-outline" class="size-4 mr-1" />自荐
-				</TabsTrigger>
+
 				<TabsTrigger value="nominations" class="flex-1">
 					<Icon icon="mdi:send-outline" class="size-4 mr-1" />我的提名
 				</TabsTrigger>
@@ -322,60 +303,6 @@
 					{/if}
 					<div bind:this={sentinelEl} class="h-4"></div>
 				{/if}
-			</TabsContent>
-
-			<!-- Recommendations Tab -->
-			<TabsContent value="recommendations" class="mt-4">
-				<Card>
-					<CardHeader>
-						<CardTitle class="text-base flex items-center gap-2">
-							<Icon icon="mdi:star-plus-outline" class="size-4" />
-							用户自荐
-						</CardTitle>
-						<CardDescription>所有用户提交的待审核自荐，你可以选择并提交精选提名</CardDescription>
-					</CardHeader>
-					<CardContent>
-						{#if !recsLoaded}
-							<div class="text-sm text-muted-foreground py-4 text-center">加载中...</div>
-						{:else if pendingRecs.length === 0}
-							<div class="text-sm text-muted-foreground py-4 text-center">无待审核自荐</div>
-						{:else}
-							<div class="space-y-2">
-								{#each pendingRecs as rec}
-									<div class="flex items-center gap-3 border rounded-lg p-2 {selectedRecPaths.has(rec.image_path) ? 'ring-2 ring-primary' : ''}">
-										<img src={getImageProxyUrl(rec.image_path)} alt="" class="size-16 object-cover rounded border shrink-0" />
-										<div class="flex-1 min-w-0 text-xs space-y-0.5">
-											<div class="truncate font-mono">{rec.image_path}</div>
-											<div class="text-muted-foreground">UID {rec.user_id} | {new Date(rec.timestamp * 1000).toLocaleString()}</div>
-										</div>
-										<input
-											type="checkbox"
-											checked={selectedRecPaths.has(rec.image_path)}
-											onchange={() => {
-												const s = new Set(selectedRecPaths);
-												if (s.has(rec.image_path)) s.delete(rec.image_path); else s.add(rec.image_path);
-												selectedRecPaths = s;
-											}}
-											class="size-4 accent-primary shrink-0"
-										/>
-									</div>
-								{/each}
-							</div>
-							{#if selectedRecPaths.size > 0}
-								<div class="mt-3">
-									<Button size="sm" onclick={async () => {
-										selectedPaths = new Set(selectedRecPaths);
-										selectedRecPaths = new Set();
-										await submitNomination();
-									}} disabled={loading}>
-										<Icon icon="mdi:send" class="size-4 mr-1" />
-										提交提名 ({selectedRecPaths.size})
-									</Button>
-								</div>
-							{/if}
-						{/if}
-					</CardContent>
-				</Card>
 			</TabsContent>
 
 			<!-- My Nominations Tab -->
