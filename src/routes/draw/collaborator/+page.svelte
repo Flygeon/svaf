@@ -7,7 +7,7 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import { forumAuth } from '$lib/forum/stores/auth';
-	import { drawEnv } from '$lib/draw/stores/env';
+	import { drawEnv, resolveApiRedirect } from '$lib/draw/stores/env';
 	import { getImageProxyUrl, getImageUrl } from '$lib/draw/api/client';
 	import * as collab from '$lib/draw/api/collaborator';
 	import { onMount, onDestroy } from 'svelte';
@@ -153,6 +153,10 @@
 			loading = false;
 		}
 	}
+
+	$effect(() => {
+		resolveApiRedirect();
+	});
 
 	$effect(() => {
 		authToken = forumAuth.getToken();
