@@ -85,7 +85,6 @@ let loadingMore = $state(false);
 	let nomImgColumns = $state<string[][]>([]);
 	let nomImgHeights: number[] = [];
 	let nomRejectReasons = $state<Record<string, string>>({});
-		let nomDialogItem = $state<any>(null);
 
 	function fmtBanDate(ts: number): string {
 		const d = new Date((ts || 0) * 1000);
@@ -1240,7 +1239,6 @@ function formatTime(ts: number) {
 										</div>
 									{/if}
 								{/each}
-							{/each}
 							</div>
 						{/each}
 					</div>
@@ -1378,7 +1376,8 @@ function formatTime(ts: number) {
 						</Button>
 						{#if featuredPaths.length === 0}
 							<div class="text-sm text-muted-foreground py-4 text-center">无精选图片</div>
-													<div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+						{:else}
+							<div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
 								{#each featuredPaths as path}
 									<div class="relative group">
 										<button
@@ -1496,47 +1495,35 @@ function formatTime(ts: number) {
 									<div class="flex flex-1 flex-col gap-2 min-w-0">
 										{#each col as path (ci + '-' + path)}
 											{@const item = nomMasonryItems.find((i: any) => i.path === path)}
-													{#if item}
-														<div class="border rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all" onclick={() => nomDialogItem = item}>
-															<img src={getImageProxyUrl(item.path)} alt={item.path} loading="lazy" decoding="async" style="aspect-ratio: 1;" onload={handleImgLoad} class="block w-full h-auto bg-muted" />
+											{#if item}
+												<div class="border rounded-lg overflow-hidden">
+													<img src={getImageProxyUrl(item.path)} alt={item.path} loading="lazy" decoding="async" style="aspect-ratio: 1;" onload={handleImgLoad} class="block w-full h-auto bg-muted" />
+													<div class="p-2 space-y-1 text-xs">
+														<div class="text-muted-foreground">UID {item.nomination.collaborator_id} | {new Date(item.nomination.submitted_at * 1000).toLocaleString()}</div>
+														{#if item.nomination.note}
+															<div class="text-muted-foreground">备注: {item.nomination.note}</div>
+														{/if}
+														<div class="flex gap-2 items-center">
+															<input type="text" bind:value={nomRejectReasons[item.nomination.id]} placeholder="拒绝理由" class="flex-1 min-w-0 rounded border border-input bg-background px-2 py-1 text-[10px] ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+
+															<Button size="sm" variant="default" onclick={() => handleNominationResolve(item.nomination.id, 'approve')} disabled={loading}>
+																<Icon icon="mdi:check" class="size-3 mr-0.5" />批准
+															</Button>
+															<Button size="sm" variant="destructive" onclick={() => handleNominationResolve(item.nomination.id, 'reject')} disabled={loading}>
+																<Icon icon="mdi:close" class="size-3 mr-0.5" />拒绝
+															</Button>
 														</div>
-													{/if}
-												{/each}
-											</div>
+													</div>
+												</div>
+											{/if}
 										{/each}
 									</div>
-								{/if}
+								{/each}
+							</div>
+						{/if}
 					</CardContent>
 				</Card>
 			</TabsContent>
-
-			{#if nomDialogItem}
-				<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/90" onclick={() => nomDialogItem = null} role="dialog">
-					<div class="relative flex flex-col items-center max-w-[90vw] max-h-[90vh]" onclick={(e) => e.stopPropagation()}>
-						<button class="absolute top-2 right-2 z-10 text-white/80 hover:text-white" onclick={() => nomDialogItem = null}>
-							<Icon icon="mdi:close" class="size-8" />
-						</button>
-						<img src={getImageUrl(nomDialogItem.path)} alt="" class="max-w-full max-h-[75vh] object-contain rounded-lg" />
-						<div class="flex items-center gap-3 mt-4 bg-background/80 backdrop-blur rounded-lg px-4 py-3">
-							<div class="text-xs text-muted-foreground mr-2">
-								UID {nomDialogItem.nomination.collaborator_id} | {nomDialogItem.nomination.image_paths.length} 张 | {new Date(nomDialogItem.nomination.submitted_at * 1000).toLocaleString()}
-							</div>
-							{#if nomDialogItem.nomination.note}
-								<div class="text-xs text-muted-foreground">备注: {nomDialogItem.nomination.note}</div>
-							{/if}
-							<Button size="sm" variant="default" onclick={() => { handleNominationResolve(nomDialogItem.nomination.id, 'approve'); nomDialogItem = null; }} disabled={loading}>
-								<Icon icon="mdi:check" class="size-4 mr-1" />通过
-							</Button>
-							<Input bind:value={nomRejectReasons[nomDialogItem.nomination.id]}
-								placeholder="拒绝理由" class="h-8 text-xs w-40"
-							/>
-							<Button size="sm" variant="destructive" onclick={() => { handleNominationResolve(nomDialogItem.nomination.id, 'reject'); nomDialogItem = null; }} disabled={loading}>
-								<Icon icon="mdi:close" class="size-4 mr-1" />拒绝
-							</Button>
-						</div>
-					</div>
-				</div>
-			{/if}
 
 			<!-- Limits -->
 			<TabsContent value="limits" class="mt-4">
