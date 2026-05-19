@@ -132,10 +132,20 @@ let loadingMore = $state(false);
 	// Lightbox
 	let lbOpen = $state(false);
 	let lbImages = $state<{ src: string; creator_id?: string; cached?: string }[]>([]);
+	let recMasonryEl = <HTMLDivElement | undefined>(undefined);
+	let recDialogItem = $state<any>(null);
+	let recDialogId = $derived(recDialogItem?.id ?? '');
 
 	// Image detail popup
 	let detailImg = $state<AdminRecentImage | null>(null);
 	let detailImgSrc = $derived(detailImg ? getImageProxyUrl(detailImg.path) : '');
+
+	function openRecDialog(rec: any, i: number) {
+		recDialogItem = rec;
+	}
+	function closeRecDialog() {
+		recDialogItem = null;
+	}
 
 	function openLb(path: string) {
 		lbImages = [{ src: getImageUrl(path), creator_id: '', cached: getImageProxyUrl(path) }];
@@ -1158,80 +1168,63 @@ function formatTime(ts: number) {
 			{/if}
 
 			<!-- Recommendations -->
-			<TabsContent value="recommendations" class="mt-4">
-				<Card>
-					<CardHeader>
-						<CardTitle class="text-base flex items-center gap-2">
-							自荐审核
-							{#if recommendations.length > 0}
-								<Badge variant="secondary">{recommendations.length}</Badge>
-							{/if}
-						</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<Button variant="outline" size="sm" onclick={loadRecommendations} disabled={loading} class="mb-3">
-							<Icon icon="mdi:refresh" class="size-4 mr-1" />刷新
-						</Button>
-						{#if recommendations.length === 0}
-							<div class="text-sm text-muted-foreground py-4 text-center">无待审核自荐</div>
-						{:else}
-							<div class="space-y-3">
-								{#each recommendations as rec, i (rec.id || i)}
-									<div class="border rounded-lg p-3 space-y-2">
-										<div class="flex items-start justify-between gap-2">
-											<div class="space-y-1 min-w-0">
-												<div class="flex items-center gap-2">
-													<Badge variant="outline" class="text-xs">ID: {rec.id?.slice(0, 8) || '???'}</Badge>
-													<span class="text-xs text-muted-foreground">{rec.timestamp ? formatTime(rec.timestamp) : ''}</span>
-												</div>
-												<div class="text-xs">
-													<span class="text-muted-foreground">图片：</span>
-													<span class="font-mono">{rec.image_path}</span>
-												</div>
-												<div class="text-xs">
-													<span class="text-muted-foreground">用户ID：</span>{rec.user_id ?? '?'}
-												</div>
-												{#if rec.user_reason}
-													<div class="text-xs">
-														<span class="text-muted-foreground">理由：</span>{rec.user_reason}
-													</div>
-												{/if}
-											</div>
-											<button
-												class="shrink-0 size-12 rounded overflow-hidden border"
-												onclick={() => openLb(rec.image_path)}
-											>
-												<img
-													src={getImageProxyUrl(rec.image_path)}
-													alt=""
-													class="w-full h-full object-cover"
-													loading="lazy"
-												/>
-											</button>
-										</div>
-										<div class="flex flex-wrap gap-1.5 items-center">
-											<Button size="sm" variant="default" onclick={() => resolveRec(rec.id, 'approve')} disabled={loading}>
-												通过
-											</Button>
-											<Input
-												bind:value={recRejectReasons[rec.id]}
-												placeholder="拒绝理由（可选）"
-												class="h-8 text-xs flex-1 min-w-[140px]"
-											/>
-											<Button size="sm" variant="destructive" onclick={() => resolveRec(rec.id, 'reject')} disabled={loading}>
-												拒绝
-											</Button>
-										</div>
-									</div>
-								{/each}
-							</div>
+						<TabsContent value="recommendations" class="mt-4">
+				<div class="flex items-center justify-between mb-3">
+					<h3 class="text-sm font-medium flex items-center gap-1.5">
+						<Icon icon="mdi:star-plus-outline" class="size-4" />
+						自荐审核
+						{#if recommendations.length > 0}
+							<Badge variant="secondary">{recommendations.length}</Badge>
 						{/if}
-					</CardContent>
-				</Card>
-			</TabsContent>
+					</h3>
+					<Button variant="ghost" size="sm" onclick={loadRecommendations} disabled={loading}>
+						<Icon icon="mdi:refresh" class="size-4" />
+					</Button>
+				</div>
+				{#if recommendations.length === 0}
+					<div class="text-sm text-muted-foreground py-8 text-center">无待审核自荐</div>
+				{:else}
+					<div bind:this={recMasonryEl} class="relative w-full">
+						<div class="rec-sizer w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5"></div>
+						{#each recommendations as rec, i (rec.id || i)}
+							<div class="rec-item w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 p-1">
+								<div class="relative group rounded-lg overflow-hidden border hover:ring-2 hover:ring-primary/50 transition-all cursor-pointer"
+									role="button" tabindex="0"
+									onclick={() => openRecDialog(rec, i)}
+								>
+									<img src={getImageProxyUrl(rec.image_path)} alt="" loading="lazy" decoding="async" class="block w-full h-auto bg-muted" />
+								</div>
+							</div>
+						{/each}
+					</div>
+				{/if}
 
-			<!-- Featured -->
-			<TabsContent value="featured" class="mt-4">
+				<!-- Approve/reject dialog -->
+				{#if recDialogItem}
+					<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/90" onclick={closeRecDialog} role="dialog">
+						<div class="relative flex flex-col items-center max-w-[90vw] max-h-[90vh]" onclick={(e) => e.stopPropagation()}>
+							<button class="absolute top-2 right-2 z-10 text-white/80 hover:text-white" onclick={closeRecDialog}>
+								<Icon icon="mdi:close" class="size-8" />
+							</button>
+							<img src={getImageUrl(recDialogItem.image_path)} alt="" class="max-w-full max-h-[75vh] object-contain rounded-lg" />
+							<div class="flex items-center gap-3 mt-4 bg-background/80 backdrop-blur rounded-lg px-4 py-3">
+								<div class="text-xs text-muted-foreground mr-2">
+									UID: {recDialogItem.user_id ?? '?'}
+								</div>
+								<Button size="sm" variant="default" onclick={() => { resolveRec(recDialogItem.id, 'approve'); closeRecDialog(); }} disabled={loading}>
+									通过
+								</Button>
+								<Input bind:value={recRejectReasons[recDialogId]}
+									placeholder="拒绝理由" class="h-8 text-xs w-40"
+								/>
+								<Button size="sm" variant="destructive" onclick={() => { resolveRec(recDialogItem.id, 'reject'); closeRecDialog(); }} disabled={loading}>
+									拒绝
+								</Button>
+							</div>
+						</div>
+					</div>
+				{/if}
+			</TabsContent><TabsContent value="featured" class="mt-4">
 				<Card>
 					<CardHeader>
 						<CardTitle class="text-base">精选管理</CardTitle>
