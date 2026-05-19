@@ -81,6 +81,9 @@ let loadingMore = $state(false);
 	let collaborators = $state<{ user_id: number; added_by: number; added_at: number }[]>([]);
 	let newCollaboratorId = $state('');
 	let pendingNominations = $state<Nomination[]>([]);
+	let nomMasonryItems = $derived(pendingNominations.flatMap((n: Nomination) => n.image_paths.map((p: string) => ({ path: p, nomination: n }))));
+	let nomImgColumns = $state<string[][]>([]);
+	let nomImgHeights: number[] = [];
 
 	function fmtBanDate(ts: number): string {
 		const d = new Date((ts || 0) * 1000);
@@ -357,6 +360,20 @@ $effect(() => {
 		rebuildColumns();
 	}
 
+	function rebuildNomImgColumns() {
+		const cc = getColumnCount();
+		nomImgColumns = Array.from({ length: cc }, () => []);
+		nomImgHeights = new Array(cc).fill(0);
+		for (const item of nomMasonryItems) {
+			let minIdx = 0;
+			for (let i = 1; i < nomImgHeights.length; i++) {
+				if (nomImgHeights[i] < nomImgHeights[minIdx]) minIdx = i;
+			}
+			nomImgColumns[minIdx] = [...nomImgColumns[minIdx], item.path];
+			nomImgHeights[minIdx] += 1;
+		}
+	}
+
 	function handleImgLoad(e: Event) {
 		const img = e.currentTarget as HTMLImageElement;
 		if (img.naturalWidth && img.naturalHeight) {
@@ -534,6 +551,7 @@ $effect(() => {
 			]);
 			collaborators = c.collaborators;
 			pendingNominations = n.items;
+			rebuildNomImgColumns();
 		} catch (e) {
 			showMsg('error', e instanceof Error ? e.message : '加载失败');
 		}
@@ -573,6 +591,7 @@ $effect(() => {
 		try {
 			await admin.resolveNomination(id, action);
 			pendingNominations = pendingNominations.filter(n => n.id !== id);
+			rebuildNomImgColumns();
 			showMsg('success', action === 'approve' ? '已批准，图片已加入精选' : '已拒绝');
 		} catch (e) {
 			showMsg('error', e instanceof Error ? e.message : '操作失败');
@@ -1466,28 +1485,31 @@ function formatTime(ts: number) {
 						{#if pendingNominations.length === 0}
 							<div class="text-sm text-muted-foreground py-4 text-center">无待审核提名</div>
 						{:else}
-							<div class="space-y-2">
-								{#each pendingNominations as nom}
-									<div class="border rounded-lg p-3 space-y-2">
-										<div class="text-xs text-muted-foreground">
-											协作者 ID: {nom.collaborator_id} | {nom.image_paths.length} 张图片 | {new Date(nom.submitted_at * 1000).toLocaleString()}
-										</div>
-										<div class="flex flex-wrap gap-1">
-											{#each nom.image_paths as p}
-												<span class="text-[10px] bg-muted px-1 py-0.5 rounded truncate max-w-[200px]">{p}</span>
-											{/each}
-										</div>
-										{#if nom.note}
-											<div class="text-xs text-muted-foreground">备注: {nom.note}</div>
-										{/if}
-										<div class="flex gap-2">
-											<Button size="sm" variant="default" onclick={() => handleNominationResolve(nom.id, 'approve')} disabled={loading}>
-												<Icon icon="mdi:check" class="size-4 mr-1" />批准
-											</Button>
-											<Button size="sm" variant="destructive" onclick={() => handleNominationResolve(nom.id, 'reject')} disabled={loading}>
-												<Icon icon="mdi:close" class="size-4 mr-1" />拒绝
-											</Button>
-										</div>
+							<div class="flex gap-2 items-start">
+								{#each nomImgColumns as col, ci (ci)}
+									<div class="flex flex-1 flex-col gap-2 min-w-0">
+										{#each col as path (ci + '-' + path)}
+											{@const item = nomMasonryItems.find((i: any) => i.path === path)}
+											{#if item}
+												<div class="border rounded-lg overflow-hidden">
+													<img src={getImageProxyUrl(item.path)} alt={item.path} loading="lazy" decoding="async" style="aspect-ratio: 1;" onload={handleImgLoad} class="block w-full h-auto bg-muted" />
+													<div class="p-2 space-y-1 text-xs">
+														<div class="text-muted-foreground">UID {item.nomination.collaborator_id} | {new Date(item.nomination.submitted_at * 1000).toLocaleString()}</div>
+														{#if item.nomination.note}
+															<div class="text-muted-foreground">备注: {item.nomination.note}</div>
+														{/if}
+														<div class="flex gap-2">
+															<Button size="sm" variant="default" onclick={() => handleNominationResolve(item.nomination.id, 'approve')} disabled={loading}>
+																<Icon icon="mdi:check" class="size-3 mr-0.5" />批准
+															</Button>
+															<Button size="sm" variant="destructive" onclick={() => handleNominationResolve(item.nomination.id, 'reject')} disabled={loading}>
+																<Icon icon="mdi:close" class="size-3 mr-0.5" />拒绝
+															</Button>
+														</div>
+													</div>
+												</div>
+											{/if}
+										{/each}
 									</div>
 								{/each}
 							</div>
