@@ -20,6 +20,8 @@
 	let allImages = $state<{ path: string; mtime: number; user_id: string }[]>([]);
 	let imagesLoaded = $state(false);
 	let imagesLoading = $state(false);
+	let displayLimit = $state(50);
+	let hasMore = $state(false);
 	let selectedPaths = $state<Set<string>>(new Set());
 	let selectMode = $state(false);
 
@@ -62,21 +64,22 @@
 		return 2;
 	}
 
-	function pushToShortest(path: string) {
-		let minIdx = 0;
-		for (let i = 1; i < columnHeights.length; i++) {
-			if (columnHeights[i] < columnHeights[minIdx]) minIdx = i;
-		}
-		imgColumns[minIdx] = [...imgColumns[minIdx], path];
-		columnHeights[minIdx] += 1;
-	}
-
 	function rebuildColumns() {
 		columnCount = getColumnCount();
-		imgColumns = Array.from({ length: columnCount }, () => []);
-		columnHeights = new Array(columnCount).fill(0);
-		for (const item of allImages) pushToShortest(item.path);
-		imgColumns = [...imgColumns];
+		const cols: string[][] = Array.from({ length: columnCount }, () => []);
+		const heights: number[] = new Array(columnCount).fill(0);
+		const display = allImages.slice(0, displayLimit);
+		for (const item of display) {
+			let minIdx = 0;
+			for (let i = 1; i < heights.length; i++) {
+				if (heights[i] < heights[minIdx]) minIdx = i;
+			}
+			cols[minIdx] = [...cols[minIdx], item.path];
+			heights[minIdx] += 1;
+		}
+		imgColumns = cols;
+		columnHeights = heights;
+		hasMore = displayLimit < allImages.length;
 	}
 
 	function handleResize() {
@@ -106,6 +109,7 @@
 			const res = await collab.getAllImages();
 			allImages = res.items;
 			imagesLoaded = true;
+			hasMore = res.total > displayLimit;
 			rebuildColumns();
 		} catch (e) {
 			showMsg('error', e instanceof Error ? e.message : '加载失败');
@@ -275,6 +279,13 @@
 							</div>
 						{/each}
 					</div>
+					{#if hasMore}
+						<div class="flex justify-center pt-2">
+							<Button variant="outline" size="sm" onclick={() => { displayLimit += 50; rebuildColumns(); }}>
+								加载更多
+							</Button>
+						</div>
+					{/if}
 				{/if}
 			</TabsContent>
 
