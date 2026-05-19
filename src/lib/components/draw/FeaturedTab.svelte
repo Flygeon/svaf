@@ -4,6 +4,7 @@
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import { fetchFeatured, getImageUrl, getImageProxyUrl } from '$lib/draw/api/client';
 	import ImageLightbox from '$lib/components/draw/ImageLightbox.svelte';
+	let masonry: any = null;
 	import type { DrawOutputItem } from '$lib/draw/types';
 
 	const tip = '精选图片由管理员挑选，展示社区优质作品。仅收录SFW';
@@ -50,11 +51,20 @@
 		if (masonryEl && items.length > 0) {
 			setTimeout(() => {
 				import('masonry-layout').then(m => {
-					new m.default(masonryEl!, {
+					if (masonry) masonry.destroy();
+					masonry = new m.default(masonryEl!, {
 						itemSelector: '.featured-item',
 						columnWidth: '.featured-sizer',
 						percentPosition: true,
 					});
+					const imgs = masonryEl.querySelectorAll("img");
+					let loaded = 0;
+					const total = imgs.length;
+					if (total === 0) return;
+					for (const img of imgs) {
+						if (img.complete) { loaded++; if (loaded === total) masonry.layout(); }
+						else img.addEventListener("load", () => { loaded++; if (loaded === total) masonry.layout(); });
+					}
 				});
 			}, 50);
 		}
@@ -65,11 +75,20 @@
 		setTimeout(() => {
 			if (masonryEl) {
 				import('masonry-layout').then(m => {
-					new m.default(masonryEl!, {
+					if (masonry) masonry.destroy();
+					masonry = new m.default(masonryEl!, {
 						itemSelector: '.featured-item',
 						columnWidth: '.featured-sizer',
 						percentPosition: true,
 					});
+					const imgs = masonryEl.querySelectorAll("img");
+					let loaded = 0;
+					const total = imgs.length;
+					if (total === 0) return;
+					for (const img of imgs) {
+						if (img.complete) { loaded++; if (loaded === total) masonry.layout(); }
+						else img.addEventListener("load", () => { loaded++; if (loaded === total) masonry.layout(); });
+					}
 				});
 			}
 		}, 100);
