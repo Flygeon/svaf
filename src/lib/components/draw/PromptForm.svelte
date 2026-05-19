@@ -29,6 +29,7 @@
 		sameSeed = $bindable(false),
 		forkSeed = $bindable<number | undefined>(undefined),
 			turnstileToken = $bindable(''),
+			turnstileTick = $bindable(0),
 	}: {
 		directPrompt?: string;
 		negativePrompt?: string;
@@ -259,6 +260,7 @@
 
 	<TurnstileWidget
 			siteKey="0x4AAAAAADSVSh5jjelMNlrv"
+			tick={turnstileTick}
 			onToken={(t) => (turnstileToken = t)}
 			onExpired={() => (turnstileToken = '')}
 		/>

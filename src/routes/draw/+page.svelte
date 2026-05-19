@@ -136,6 +136,7 @@
 	let apiErrorMessage = $state("");
 	let apiStatusValue = $state("checking");
 		let turnstileToken = $state("");
+		let turnstileTick = $state(0);
 		let forkMessage = $state("");
 
 	$effect(() => {
@@ -347,6 +348,7 @@ async function startGeneration() {
 				turnstile_token: turnstileToken || undefined,
 				});
 				queueSuccess = '成功加入队列！等待生图中，前往"我的"页面查看详情。';
+				turnstileTick++;
 				loadMyQueue();
 				if (!queueTimer) queueTimer = setInterval(loadMyQueue, 1000);
 			} catch (e) {
@@ -679,6 +681,7 @@ async function startGeneration() {
 
 					<PromptForm
 						bind:turnstileToken
+						bind:turnstileTick
 						bind:directPrompt
 						bind:negativePrompt
 						bind:nlPrompt
@@ -709,7 +712,7 @@ async function startGeneration() {
 				</TabsContent>
 
 				<TabsContent value="img2img" class="mt-4">
-					<Img2imgTab bind:turnstileToken />
+					<Img2imgTab bind:turnstileToken bind:turnstileTick />
 				</TabsContent>
 
 			</Tabs>

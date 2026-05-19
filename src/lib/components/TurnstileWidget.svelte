@@ -18,6 +18,7 @@
 
 	$effect(() => {
 		if (!siteKey || !containerEl) return;
+			if (tick) {} /* force re-render when tick changes */
 		const container = containerEl;
 		container.innerHTML = '';
 

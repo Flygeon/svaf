@@ -14,8 +14,10 @@
 
 	let {
 		turnstileToken = $bindable(''),
+			turnstileTick = $bindable(0),
 	}: {
 		turnstileToken?: string;
+			turnstileTick?: number;
 	} = $props();
 
 	let currentBaseUrl = $state('');
@@ -354,6 +356,7 @@
 
 	<TurnstileWidget
 			siteKey="0x4AAAAAADSVSh5jjelMNlrv"
+			tick={turnstileTick}
 			onToken={(t) => (turnstileToken = t)}
 			onExpired={() => (turnstileToken = '')}
 		/>
