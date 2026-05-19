@@ -958,6 +958,8 @@ function formatTime(ts: number) {
 				请先<a href="/forum/auth/login" class="underline font-medium">登录论坛</a>（需要管理员账号）。
 			</AlertDescription>
 		</Alert>
+			{/if}
+		{#if authToken}
 			{#if message}
 			<Alert variant={message.type === 'error' ? 'destructive' : 'default'}>
 				<AlertDescription class="text-xs">{message.text}</AlertDescription>
