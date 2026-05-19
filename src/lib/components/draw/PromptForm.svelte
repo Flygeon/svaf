@@ -99,6 +99,12 @@
 					turnstile_token: translateToken || undefined
 				})
 			});
+			if (!resp.ok) {
+				const err = await resp.json().catch(() => ({}));
+				translateError = err.detail || err.error || err.message || '翻译请求失败';
+				translating = false;
+				return;
+			}
 			const reader = resp.body.getReader();
 			const decoder = new TextDecoder();
 			let buffer = '';
