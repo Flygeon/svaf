@@ -958,8 +958,7 @@ function formatTime(ts: number) {
 				请先<a href="/forum/auth/login" class="underline font-medium">登录论坛</a>（需要管理员账号）。
 			</AlertDescription>
 		</Alert>
-	{:else}
-		{#if message}
+			{#if message}
 			<Alert variant={message.type === 'error' ? 'destructive' : 'default'}>
 				<AlertDescription class="text-xs">{message.text}</AlertDescription>
 			</Alert>
@@ -1011,8 +1010,7 @@ function formatTime(ts: number) {
 							公告管理
 							{#if announcement.enabled}
 								<Badge>已开启</Badge>
-							{:else}
-								<Badge variant="secondary">已关闭</Badge>
+															<Badge variant="secondary">已关闭</Badge>
 							{/if}
 						</CardTitle>
 					</CardHeader>
@@ -1155,12 +1153,10 @@ function formatTime(ts: number) {
 						<div class="p-3 space-y-3 text-xs">
 							<div class="grid grid-cols-2 gap-2">
 								<div>
-									<p class="text-[10px] text-muted-foreground mb-1">原图</p>
+									<p class="text-[10px] text-muted-foreground mb-1">原图 1</p>
 									{#if detailImg.image1}
 										<img src="{currentBaseUrl}/api/uploads/{detailImg.image1}" alt="原图" class="w-full rounded border max-h-48 object-contain" loading="lazy" />
-									{:else}
-										<div class="w-full h-32 rounded border bg-muted flex items-center justify-center text-muted-foreground text-[10px]">无原图</div>
-									{/if}
+																			{/if}
 								</div>
 								<div>
 									<p class="text-[10px] text-muted-foreground mb-1">结果图</p>
@@ -1173,8 +1169,8 @@ function formatTime(ts: number) {
 							</div>
 							{#if detailImg.image2}
 								<div>
-									<span class="text-muted-foreground">原始图片 2：</span>
-									<a href="{currentBaseUrl}/api/uploads/{detailImg.image2}" target="_blank" class="text-primary underline">查看</a>
+									<span class="text-muted-foreground">原图 2</span>
+									<img src="{currentBaseUrl}/api/uploads/{detailImg.image2}" alt="原图2" class="w-full rounded border max-h-48 object-contain" loading="lazy" />
 								</div>
 							{/if}
 							{#if detailImg.prompt}
@@ -1210,8 +1206,7 @@ function formatTime(ts: number) {
 				</div>
 				{#if recommendations.length === 0}
 					<div class="text-sm text-muted-foreground py-8 text-center">无待审核自荐</div>
-				{:else}
-					<div bind:this={recMasonryEl} class="relative w-full">
+									<div bind:this={recMasonryEl} class="relative w-full">
 						<div class="rec-sizer w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5"></div>
 						{#each recommendations as rec, i (rec.id || i)}
 							<div class="rec-item w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 p-1">
@@ -1272,8 +1267,7 @@ function formatTime(ts: number) {
 						</Button>
 						{#if featuredPaths.length === 0}
 							<div class="text-sm text-muted-foreground py-4 text-center">无精选图片</div>
-						{:else}
-							<div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+													<div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
 								{#each featuredPaths as path}
 									<div class="relative group">
 										<button
@@ -1328,8 +1322,7 @@ function formatTime(ts: number) {
 						</Button>
 						{#if bannedUsers.length === 0}
 							<div class="text-sm text-muted-foreground py-4 text-center">无封禁用户</div>
-						{:else}
-							<div class="space-y-1.5">
+													<div class="space-y-1.5">
 								{#each bannedUsers as ban}
 									<div class="flex items-center justify-between border rounded-md px-3 py-2">
 										<span class="text-sm font-mono">{ban.user_id} - {ban.reason || '违规行为'}（{ban.remaining_days || '?'}天）</span>
@@ -1375,8 +1368,7 @@ function formatTime(ts: number) {
 									<Button variant="destructive" size="sm" onclick={handleClearQueue} disabled={clearing}>
 										{#if clearing}
 											<Icon icon="mdi:loading" class="size-4 mr-1 animate-spin" />
-										{:else}
-											<Icon icon="mdi:delete-sweep" class="size-4 mr-1" />
+																					<Icon icon="mdi:delete-sweep" class="size-4 mr-1" />
 										{/if}
 										清空队列
 									</Button>
@@ -1488,8 +1480,7 @@ function formatTime(ts: number) {
 											{/each}
 										</div>
 									</div>
-								{:else}
-									<div class="space-y-1.5">
+																	<div class="space-y-1.5">
 										<Label class="text-xs">API 端点 <span class="text-[9px] text-muted-foreground">（完整路径，含 /v1）</span></Label>
 										<Input class="text-xs" bind:value={p.custom_endpoint} placeholder="https://api.openai.com/v1" />
 									</div>
@@ -1514,8 +1505,7 @@ function formatTime(ts: number) {
 										<p class="text-[10px] text-muted-foreground mb-1">可用模型（{llmModels.length} 个）：</p>
 										{#if llmModels.length === 0}
 											<p class="text-xs text-muted-foreground">无可用模型或探测失败</p>
-										{:else}
-											{#each llmModels as model}
+																					{#each llmModels as model}
 												<div class="text-xs py-0.5 hover:bg-accent rounded px-1 cursor-pointer"
 													onclick={() => {
 														/* full id */
@@ -1546,8 +1536,7 @@ function formatTime(ts: number) {
 											<Icon icon="mdi:check-circle-outline" class="size-3.5 mr-1" />
 											设为当前配置
 										</Button>
-									{:else}
-										<Badge variant="outline" class="text-xs text-green-600 border-green-300">当前配置</Badge>
+																			<Badge variant="outline" class="text-xs text-green-600 border-green-300">当前配置</Badge>
 									{/if}
 								</div>
 
@@ -1556,8 +1545,7 @@ function formatTime(ts: number) {
 										<AlertDescription class="text-xs">
 											{#if llmTestResult.ok}
 												<span class="font-medium text-green-600">✓ {llmTestResult.provider}</span> — {llmTestResult.reply}
-											{:else}
-												<span class="font-medium">✗ 失败</span> — {llmTestResult.error}
+																							<span class="font-medium">✗ 失败</span> — {llmTestResult.error}
 												{#if llmTestResult.raw}
 													<br /><span class="text-[9px] text-muted-foreground">原始回复: {llmTestResult.raw}</span>
 												{/if}
@@ -1777,8 +1765,7 @@ function formatTime(ts: number) {
 						<!-- Style grid -->
 						{#if styles.length === 0}
 							<div class="text-sm text-muted-foreground py-4 text-center">无画风</div>
-						{:else}
-							<div class="flex flex-wrap gap-2">
+													<div class="flex flex-wrap gap-2">
 								{#each styles as s, i}
 									<div class="inline-flex flex-col items-center gap-1 p-1.5 rounded-md border border-border hover:bg-accent transition-all group {styleRenaming === i ? 'border-primary ring-1 ring-primary/30' : ''}">
 										<!-- Thumbnail: click to upload -->
@@ -1794,8 +1781,7 @@ function formatTime(ts: number) {
 													class="w-full h-full object-cover"
 													loading="lazy"
 												/>
-											{:else}
-												<Icon icon="mdi:image-plus-outline" class="size-5 text-muted-foreground" />
+																							<Icon icon="mdi:image-plus-outline" class="size-5 text-muted-foreground" />
 											{/if}
 											<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 												<Icon icon="mdi:upload" class="size-4 text-white" />
@@ -1828,8 +1814,7 @@ function formatTime(ts: number) {
 													onblur={commitStyleRename}
 												/>
 											</div>
-										{:else}
-											<span
+																					<span
 												class="text-xs text-center truncate max-w-24 cursor-default"
 												title="双击编辑 | 右键详情"
 												ondblclick={() => startStyleRename(i)}
@@ -1907,8 +1892,7 @@ function formatTime(ts: number) {
 													class="w-full h-full object-cover"
 													loading="lazy"
 												/>
-											{:else}
-												<Icon icon="mdi:image-plus-outline" class="size-5 text-muted-foreground" />
+																							<Icon icon="mdi:image-plus-outline" class="size-5 text-muted-foreground" />
 											{/if}
 											<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 												<Icon icon="mdi:upload" class="size-4 text-white" />
@@ -1932,8 +1916,7 @@ function formatTime(ts: number) {
 												onkeydown={(e) => { if (e.key === 'Enter') commitWfRename(); if (e.key === 'Escape') wfRenaming = ''; }}
 												onblur={commitWfRename}
 											/>
-										{:else}
-											<span
+																					<span
 												class="text-xs text-center truncate max-w-24 cursor-default"
 												title="双击重命名 | 右键编辑元数据"
 												ondblclick={() => startWfRename(wf)}
@@ -1945,8 +1928,7 @@ function formatTime(ts: number) {
 									</div>
 								{/each}
 							</div>
-						{:else}
-							<div class="text-sm text-muted-foreground py-4 text-center">无工作流</div>
+													<div class="text-sm text-muted-foreground py-4 text-center">无工作流</div>
 						{/if}
 					</CardContent>
 				</Card>
@@ -1976,8 +1958,7 @@ function formatTime(ts: number) {
 					}}
 					class="max-w-32"
 				/>
-			{:else}
-				<Input
+							<Input
 					type="text"
 					value={String(limits[key])}
 					oninput={(e) => {
