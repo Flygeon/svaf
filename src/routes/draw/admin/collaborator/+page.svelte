@@ -94,6 +94,13 @@
 		selectedPaths = next;
 	}
 
+	function handleImgLoad(e: Event) {
+		const img = e.currentTarget as HTMLImageElement;
+		if (img.naturalWidth && img.naturalHeight) {
+			img.style.aspectRatio = `${img.naturalWidth / img.naturalHeight}`;
+		}
+	}
+
 	function openLb(index: number) {
 		lbIndex = index;
 		lbImages = allImages.map(i => ({ src: getImageUrl(i.path), creator_id: i.user_id, cached: getImageProxyUrl(i.path) }));
@@ -287,6 +294,7 @@
 												loading="lazy"
 												decoding="async"
 												style="aspect-ratio: 1;"
+												onload={handleImgLoad}
 												class="block w-full h-auto bg-muted"
 											/>
 											{#if selectMode}
