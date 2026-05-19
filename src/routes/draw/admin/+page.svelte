@@ -1495,26 +1495,11 @@ function formatTime(ts: number) {
 									<div class="flex flex-1 flex-col gap-2 min-w-0">
 										{#each col as path (ci + '-' + path)}
 											{@const item = nomMasonryItems.find((i: any) => i.path === path)}
-											{#if item}
-												<div class="border rounded-lg overflow-hidden">
-													<img src={getImageProxyUrl(item.path)} alt={item.path} loading="lazy" decoding="async" style="aspect-ratio: 1;" onload={handleImgLoad} class="block w-full h-auto bg-muted" />
-													<div class="p-2 space-y-1 text-xs">
-														<div class="text-muted-foreground">UID {item.nomination.collaborator_id} | {new Date(item.nomination.submitted_at * 1000).toLocaleString()}</div>
-														{#if item.nomination.note}
-															<div class="text-muted-foreground">备注: {item.nomination.note}</div>
-														{/if}
-														<div class="flex gap-2">
-															<Button size="sm" variant="default" onclick={() => handleNominationResolve(item.nomination.id, 'approve')} disabled={loading}>
-																<Icon icon="mdi:check" class="size-3 mr-0.5" />批准
-															</Button>
-															<Button size="sm" variant="destructive" onclick={() => handleNominationResolve(item.nomination.id, 'reject')} disabled={loading}>
-																<Icon icon="mdi:close" class="size-3 mr-0.5" />拒绝
-															</Button>
-														</div>
+												{#if item}
+													<div class="border rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all" onclick={() => nomDialogItem = item}>
+														<img src={getImageProxyUrl(item.path)} alt={item.path} loading="lazy" decoding="async" style="aspect-ratio: 1;" onload={handleImgLoad} class="block w-full h-auto bg-muted" />
 													</div>
-												</div>
-											{/if}
-										{/each}
+												{/if}
 									</div>
 								{/each}
 							</div>
