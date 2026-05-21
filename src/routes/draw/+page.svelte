@@ -573,6 +573,7 @@ async function startGeneration() {
 		<div class="flex items-center gap-2">
 			<Icon icon="mdi:palette" class="size-6 text-primary" />
 			<h1 class="text-xl font-bold">AI 生图</h1>
+			<a href="https://2x.nz/posts/ai-wife/#%E6%96%B0%E7%89%88-2xnzdraw-%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7" target="_blank" rel="noopener noreferrer" class="rainbow-q ml-0.5" title="使用技巧">?</a>
 				<PageViews pathname="/draw/" class="text-sm text-muted-foreground" />
 			{#if onlineCount > 0}
 				<Badge variant="secondary" class="text-xs">
@@ -921,4 +922,27 @@ async function startGeneration() {
 	onrecommend={handleRecommend}
 />
 </div>
+
+<style>
+	@keyframes rainbow {
+		0% { color: #ff0000; }
+		16% { color: #ff8800; }
+		33% { color: #ffff00; }
+		50% { color: #00ff00; }
+		66% { color: #0088ff; }
+		83% { color: #8800ff; }
+		100% { color: #ff0000; }
+	}
+	.rainbow-q {
+		display: inline-block;
+		font-size: 1rem;
+		font-weight: bold;
+		cursor: pointer;
+		text-decoration: none;
+		animation: rainbow 3s linear infinite;
+	}
+	.rainbow-q:hover {
+		opacity: 0.8;
+	}
+</style>
 
