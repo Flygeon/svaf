@@ -267,7 +267,7 @@ https://github.com/afoim/natureDrawImage
 
 #### 使用DanBooru角色库
 
-目前图生图采用 **WAI** 模型，仅支持动漫画风。它本身可以跑很多角色，具体参见 [Danbooru characters in NoobAI-XL (NAI-XL)](https://www.downloadmost.com/NoobAI-XL/danbooru-character/)
+目前文生图采用 **WAI** 模型，仅支持动漫画风。它本身可以跑很多角色，具体参见 [Danbooru characters in NoobAI-XL (NAI-XL)](https://www.downloadmost.com/NoobAI-XL/danbooru-character/)
 
 你需要将 **工作流** 切换为 **无Lora** 避免角色Lora影响最终出图
 
