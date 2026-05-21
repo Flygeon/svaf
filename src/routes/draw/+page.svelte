@@ -573,7 +573,9 @@ async function startGeneration() {
 		<div class="flex items-center gap-2">
 			<Icon icon="mdi:palette" class="size-6 text-primary" />
 			<h1 class="text-xl font-bold">AI 生图</h1>
-			<a href="https://2x.nz/posts/ai-wife/#%E6%96%B0%E7%89%88-2xnzdraw-%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7" target="_blank" rel="noopener noreferrer" class="rainbow-q ml-0.5" title="使用技巧">?</a>
+			<a href="https://2x.nz/posts/ai-wife/#%E6%96%B0%E7%89%88-2xnzdraw-%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7" target="_blank" rel="noopener noreferrer" class="help-glow ml-1.5" title="使用技巧">
+				<span class="help-dot"></span>
+			</a>
 				<PageViews pathname="/draw/" class="text-sm text-muted-foreground" />
 			{#if onlineCount > 0}
 				<Badge variant="secondary" class="text-xs">
@@ -924,25 +926,43 @@ async function startGeneration() {
 </div>
 
 <style>
-	@keyframes rainbow {
-		0% { color: #ff0000; }
-		16% { color: #ff8800; }
-		33% { color: #ffff00; }
-		50% { color: #00ff00; }
-		66% { color: #0088ff; }
-		83% { color: #8800ff; }
-		100% { color: #ff0000; }
-	}
-	.rainbow-q {
-		display: inline-block;
-		font-size: 1rem;
-		font-weight: bold;
+	.help-glow {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		border: 1px solid var(--border);
+		background: var(--muted);
 		cursor: pointer;
 		text-decoration: none;
-		animation: rainbow 3s linear infinite;
+		transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+		box-shadow: 0 0 6px rgba(168, 85, 247, 0.15);
+		animation: glow-pulse 3s ease-in-out infinite;
 	}
-	.rainbow-q:hover {
-		opacity: 0.8;
+	.help-glow:hover {
+		border-color: rgb(168 85 247);
+		background: color-mix(in srgb, var(--muted) 60%, rgb(168 85 247));
+		box-shadow: 0 0 14px rgba(168, 85, 247, 0.4);
+		animation: none;
+	}
+	.help-dot {
+		display: block;
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: rgb(168 85 247);
+		transition: background 0.2s, transform 0.2s;
+	}
+	.help-glow:hover .help-dot {
+		background: white;
+		transform: scale(1.3);
+	}
+
+	@keyframes glow-pulse {
+		0%, 100% { box-shadow: 0 0 6px rgba(168, 85, 247, 0.12); }
+		50% { box-shadow: 0 0 14px rgba(168, 85, 247, 0.3); }
 	}
 </style>
 
