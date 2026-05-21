@@ -258,3 +258,86 @@ https://github.com/afoim/natureDrawImage
 其余概述参见仓库 README 由于文章具有时效性，如果有不懂的地方建议询问AI
 
 ![](img/Screenshot_2026-04-26-14-53-03-67.jpg)
+
+# 新版 2x.nz/draw 使用技巧
+
+> 我们构建了一个站点，可以供AI绘图爱好者们免费生图： https://2x.nz/draw
+
+### 文生图
+
+#### 使用DanBooru角色库
+
+目前图生图采用 **WAI** 模型，仅支持动漫画风。它本身可以跑很多角色，具体参见 [Danbooru characters in NoobAI-XL (NAI-XL)](https://www.downloadmost.com/NoobAI-XL/danbooru-character/)
+
+你需要将 **工作流** 切换为 **无Lora** 避免角色Lora影响最终出图
+
+![](img/index-2.png)
+
+搜索（用英文）并选择一个你想跑的角色，复制角色tag
+
+![](img/index-3.png)
+
+填入正向提示词
+
+![](img/index-4.png)
+
+DanBooru的角色有非常多，所以在大多数情况下，我们不需要引入特定角色的Lora即可出图
+
+![](img/index-15.png)
+
+![](img/index-5.png)
+
+#### 使用角色Lora
+
+直接选择你想跑的角色的工作流，正向提示词会自动添加，直接生图即可
+
+![](img/index-6.png)
+
+![](img/index-8.png)
+#### 自定义绘画
+
+你可以使用 **英文Tag** 来控制图像生成，如在正向提示词添加 `school` ，则最终出图会有 **学校元素** （图例为校服）
+
+![](img/index-7.png)
+
+![](img/index-9.png)
+
+为了便于理解和使用，你可以在**自然语言描述** 文本框中输入 **中文的自然语言** ，随后选择 **转换** ，LLM将会把你的需求和原本的Prompt融合，最终在 **正/负面提示词** 输出合并后的 **英文Tag** 
+
+你也可以手动使用主流LLM来做这件事，如 Deepseek，ChatGPT，Gemini，Claude...
+
+![](img/msedge_hAkxNR1yEH.gif)
+
+![](img/index-11.png)
+
+#### 反向提示词
+
+顾名思义，在这里填写的 **英文Tag** ，模型会尽可能回避。最常用的情况是填写 `nsfw` ，防止模型出涩图
+
+#### 画风/风格
+
+实际上，画风是一个特殊的 **英文Tag** ，由 `by` 开头，所有画风可以前往 [Danbooru Artists' Styles in NoobAI-XL (NAI-XL)](https://www.downloadmost.com/NoobAI-XL/danbooru-artist/) 寻找。这也是 DanBooru 提供的，我们默认已经精选了一批画风。可以直接选择，选择后，将会在最终生图前，为正向Prompt注入画风Tag
+
+![](img/index-12.png)
+
+![](img/index-13.png)
+#### 将这些串起来
+
+读到这里，想必你已经完全掌握了文生图的用法。无外乎三件事
+
+- 跑谁？即从DanBooru角色库中选择角色或直接选择角色Lora
+- 怎么跑？即你想让图中的角色做什么，通过自然语言描述+LLM转换或直接通过书写 **英文Tag** 来指示模型生成你想要的图片
+- 怎么画？即你想要的出图画风，这是可选项，但推荐选择。默认画风AI感太重
+
+Enjoy txt2img！
+
+### 图生图
+
+相比于文生图，图生图要简单的多，你只需要上传图片，并描述你想要做的事情即可。尽管支持中文描述，但**英文描述的遵从度更高**
+
+*这是一个提示词工程。模型的上限取决于你的指示*
+
+![](img/index-16.png)
+![](img/index-14.png)
+
+Now, eojoy img2img!
