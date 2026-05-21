@@ -570,7 +570,7 @@ async function startGeneration() {
 <div class="w-full max-w-4xl mx-auto px-4 py-6 space-y-4">
 	<!-- Header -->
 	<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-		<div class="flex items-center gap-2">
+		<div class="flex items-center gap-x-2 gap-y-1 flex-wrap">
 			<Icon icon="mdi:palette" class="size-6 text-primary" />
 			<h1 class="text-xl font-bold">AI 生图</h1>
 			<a href="https://2x.nz/posts/ai-wife/#%E6%96%B0%E7%89%88-2xnzdraw-%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2.5 h-7 rounded-4xl text-xs font-medium border border-border bg-input/30 text-muted-foreground hover:bg-input/50 hover:text-foreground transition-all no-underline shrink-0">
