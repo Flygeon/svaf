@@ -35,7 +35,7 @@
 			<Button variant="outline" class="w-full justify-start gap-2" {...props}>
 				<Icon icon="mdi:cog-outline" class="size-4" />
 				{#if value}
-					<span class="truncate">{value.split('/').pop()?.replace('.json', '')}</span>
+					<span class="truncate">{value.split('/').pop()?.replace(/\.(json|txt)$/, '')}</span>
 				{:else}
 					<span class="text-muted-foreground">选择工作流</span>
 				{/if}

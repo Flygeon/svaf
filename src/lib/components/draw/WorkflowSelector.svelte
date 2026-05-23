@@ -52,7 +52,7 @@
 		$effect(() => {
 			if (workflows.length > 0 && value && !inited) {
 				inited = true;
-				fetchWorkflowDetail(value).then(detail => {
+				fetchWorkflowDetail(value, undefined, subdir).then(detail => {
 					onpromptload?.(detail.builtin_prompt, detail.builtin_negative_prompt);
 				}).catch(() => {});
 			}
@@ -79,7 +79,7 @@
 		abortCtrl = new AbortController();
 		loadingPath = wf.path;
 
-		fetchWorkflowDetail(wf.path, abortCtrl.signal)
+		fetchWorkflowDetail(wf.path, abortCtrl.signal, subdir)
 			.then((detail) => {
 				if (!abortCtrl?.signal.aborted) {
 					onpromptload?.(detail.builtin_prompt, detail.builtin_negative_prompt);

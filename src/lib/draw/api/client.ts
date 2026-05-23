@@ -113,9 +113,9 @@ export async function fetchWorkflows(subdir?: string) {
 	}>('/api/workflows', { query: { subdir } });
 }
 
-export async function fetchWorkflowDetail(path: string, signal?: AbortSignal) {
+export async function fetchWorkflowDetail(path: string, signal?: AbortSignal, subdir?: string) {
 	return drawRequest<import('../types').DrawWorkflowDetail>('/api/workflows/current', {
-		query: { path },
+		query: { path, subdir },
 		signal
 	});
 }
