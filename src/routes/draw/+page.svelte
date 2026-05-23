@@ -911,22 +911,6 @@ async function startGeneration(mode = 'wai') {
 									</Dialog.Content>
 </Dialog.Root>
 
-<Dialog.Root open={animaHelpOpen} onOpenChange={(o) => animaHelpOpen = o}>
-	<Dialog.Content class="max-w-md">
-		<Dialog.Header>
-			<Dialog.Title>ℹ️ 关于 Anima</Dialog.Title>
-			<Dialog.Description class="text-sm leading-relaxed">
-				<div class="space-y-2">
-					<div>最新的动漫文生图模型，推荐使用 <strong>自然语言的英文</strong> 描述画面，模型理解能力极强，非常听话！</div>
-					<div>角色库：<a href="https://www.downloadmost.com/NoobAI-XL/danbooru-character/" target="_blank" rel="noopener noreferrer" class="text-primary underline">Danbooru Characters</a>（与 WAI 共用）</div>
-					<div>画风库：<a href="https://thetacursed.github.io/Anima-Style-Explorer/" target="_blank" rel="noopener noreferrer" class="text-primary underline">Anima Style Explorer</a>（专用）</div>
-				</div>
-			</Dialog.Description>
-		</Dialog.Header>
-	</Dialog.Content>
-</Dialog.Root>
-
-
 						{#if myImagesLoading}
 							<div class="text-xs text-muted-foreground py-8 text-center">加载中...</div>
 						{:else if myImages.length === 0}
@@ -1038,4 +1022,18 @@ async function startGeneration(mode = 'wai') {
 	</Dialog.Content>
 </Dialog.Root>
 
+<Dialog.Root open={animaHelpOpen} onOpenChange={(o) => animaHelpOpen = o}>
+	<Dialog.Content class="max-w-md">
+		<Dialog.Header>
+			<Dialog.Title>ℹ️ 关于 Anima</Dialog.Title>
+			<Dialog.Description class="text-sm leading-relaxed">
+				<div class="space-y-2">
+					<div>最新的动漫文生图模型，推荐使用 <strong>自然语言的英文</strong> 描述画面，模型理解能力极强，非常听话！</div>
+					<div>角色库：<a href="https://www.downloadmost.com/NoobAI-XL/danbooru-character/" target="_blank" rel="noopener noreferrer" class="text-primary underline">Danbooru Characters</a>（与 WAI 共用）</div>
+					<div>画风库：<a href="https://thetacursed.github.io/Anima-Style-Explorer/" target="_blank" rel="noopener noreferrer" class="text-primary underline">Anima Style Explorer</a>（专用）</div>
+				</div>
+			</Dialog.Description>
+		</Dialog.Header>
+	</Dialog.Content>
+</Dialog.Root>
 
