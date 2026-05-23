@@ -870,6 +870,9 @@ async function startGeneration(mode = 'wai') {
 															<input type="checkbox" checked={selectedPaths.has(item.path)} onchange={() => toggleSelect(item.path)} class="size-4 accent-primary" />
 														</div>
 													{/if}
+													<button onclick={(e) => { e.stopPropagation(); if (confirm('确定删除这张图片？')) deleteMyImage(item.path).then(() => { myImagesLoaded = false; loadMyImages(); }); }} class="absolute top-1 right-1 size-5 flex items-center justify-center rounded-full bg-black/40 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/80" title="删除">
+														<Icon icon="mdi:close" class="size-3" />
+													</button>
 												</div>
 											{/if}
 										{/each}
