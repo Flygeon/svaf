@@ -63,7 +63,7 @@
 		error = '';
 		try {
 			const res = await fetchWorkflows(subdir);
-			workflows = res.workflows.filter(w => !w.path.endsWith('.txt'));
+			workflows = res.workflows;
 		} catch (e) {
 			error = e instanceof Error ? e.message : '加载工作流失败';
 		} finally {
