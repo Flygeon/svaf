@@ -280,9 +280,9 @@
 				</div>
 			</div>
 			{#if forumAuth.getToken()}
-				<div class="space-y-2 pt-1">
-					<div>
-						<div class="flex items-center justify-between mb-1">
+				<div class="grid grid-cols-2 gap-3 pt-1">
+					<div class="space-y-1">
+						<div class="flex items-center justify-between">
 							<Label class="text-xs font-medium text-primary/80">正面预设</Label>
 							<button onclick={() => { newPresetName = ''; newPresetContent = ''; newPresetType = 'positive'; presetDialogOpen = true; }} class="text-xs text-primary hover:underline flex items-center gap-0.5">
 								<Icon icon="mdi:plus" class="size-3.5" />新建
@@ -300,8 +300,8 @@
 							{/if}
 						</div>
 					</div>
-					<div>
-						<div class="flex items-center justify-between mb-1">
+					<div class="space-y-1">
+						<div class="flex items-center justify-between">
 							<Label class="text-xs font-medium text-red-400/80">反面预设</Label>
 							<button onclick={() => { newPresetName = ''; newPresetContent = ''; newPresetType = 'negative'; presetDialogOpen = true; }} class="text-xs text-primary hover:underline flex items-center gap-0.5">
 								<Icon icon="mdi:plus" class="size-3.5" />新建
