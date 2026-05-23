@@ -649,7 +649,7 @@ async function startGeneration() {
 			{/if}
 			{#if isLoggedIn && walletBalance !== null}
 				<button onclick={() => rechargeOpen = true} class="inline-flex items-center gap-0.5 px-2 h-6 rounded-4xl text-xs font-medium border border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-colors shrink-0">
-					⚡{walletBalance}
+					⚡{walletBalance}<span class="ml-1 text-[10px] opacity-70">点我充值</span>
 				</button>
 			{/if}
 		</div>
