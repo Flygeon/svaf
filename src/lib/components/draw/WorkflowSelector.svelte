@@ -22,7 +22,6 @@
 	} = $props();
 
 	let workflows = $state<DrawWorkflow[]>([]);
-	let categoryOrder = $state<string[]>([]);
 	let search = $state('');
 	let showSearch = $state(false);
 	let loading = $state(true);
@@ -40,25 +39,9 @@
 
 	const grouped = $derived(() => {
 		const list = filtered();
-		const order = categoryOrder.length ? categoryOrder : [...new Set(list.map((w) => w.category))];
-		const groups: { category: string; items: DrawWorkflow[] }[] = [];
-		const seen = new Set<string>();
-		for (const cat of order) {
-			const items = list.filter((w) => w.category === cat);
-			if (items.length) {
-				groups.push({ category: cat, items });
-				seen.add(cat);
-			}
-		}
-		// remaining categories not in order
-		const remaining = list.filter((w) => !seen.has(w.category));
-		if (remaining.length) {
-			const cats = [...new Set(remaining.map((w) => w.category))];
-			for (const cat of cats) {
-				groups.push({ category: cat, items: remaining.filter((w) => w.category === cat) });
-			}
-		}
-		return groups;
+		const cats = [...new Set(list.map((w) => w.category))];
+		cats.sort((a, b) => (a === '' ? 0 : 1) - (b === '' ? 0 : 1));
+		return cats.map(cat => ({ category: cat, items: list.filter(w => w.category === cat) }));
 	});
 
 	$effect(() => {
@@ -81,7 +64,6 @@
 		try {
 			const res = await fetchWorkflows(subdir);
 			workflows = res.workflows;
-			categoryOrder = res.category_order;
 		} catch (e) {
 			error = e instanceof Error ? e.message : '加载工作流失败';
 		} finally {
@@ -155,7 +137,7 @@
 		<div class="{constrainHeight ? 'max-h-64' : ''} overflow-y-auto space-y-2 pr-1">
 			{#each grouped() as group}
 				<div>
-					<div class="text-xs text-muted-foreground font-medium mb-1 px-0.5">{group.category}</div>
+					<div class="text-xs text-muted-foreground font-medium mb-1 px-0.5">{group.category || '未分类'}</div>
 					<div class="flex flex-wrap gap-1.5">
 						{#each group.items as wf}
 							<button
