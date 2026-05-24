@@ -305,13 +305,11 @@
 		styleName = name;
 	}
 
-	function handlePromptLoad(positive: string, negative: string, workflowApi?: Record<string, any>, wfPath?: string) {
+	function handlePromptLoad(positive: string, negative: string) {
 			directPrompt = positive;
 			negativePrompt = negative;
 			workflowPrompt = positive;
 			workflowNegativePrompt = negative;
-			if (workflowApi) inlineWorkflowApi = workflowApi;
-			if (wfPath) { workflowPath = wfPath; workflowName = wfPath.split('/').pop()?.replace(/\.(json|txt)$/, '') || ''; }
 			localStorage.setItem('wf_prompt', positive);
 			localStorage.setItem('wf_neg_prompt', negative);
 		}
@@ -364,6 +362,13 @@ async function startGeneration(mode = 'wai') {
 				? `${directPrompt}`
 				: directPrompt;
 
+			// Tag preset → fallback to 无Lora base workflow
+			let finalWfPath = workflowPath;
+			if (finalWfPath.endsWith('.txt')) {
+				const subdir = mode === 'anima' ? 'ANIMA' : 'WAI';
+				finalWfPath = `${subdir}/通用/无Lora.json`;
+			}
+
 			queuing = true;
 			queueSuccess = '';
 			queueError = '';
@@ -375,9 +380,8 @@ async function startGeneration(mode = 'wai') {
 					style_tags: styleTags || undefined,
 					negative_prompt: negativePrompt || undefined,
 					seed: sameSeed ? forkSeed : undefined,
-					workflow_path: workflowPath,
+					workflow_path: finalWfPath,
 					inline_workflow: inlineWorkflow || undefined,
-					inline_workflow_api: inlineWorkflowApi || undefined,
 					mode,
 				turnstile_token: turnstileToken || undefined,
 				});
