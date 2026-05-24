@@ -1053,13 +1053,13 @@ async function startGeneration(mode = 'wai') {
 				<div class="text-xs text-muted-foreground py-4 text-center">暂无充值方案</div>
 			{:else}
 				{#each plans as plan}
-					<a href={plan.url} target="_blank" rel="noopener noreferrer" class="flex items-center justify-between px-3 py-2 rounded-lg border border-border hover:bg-accent transition-colors text-sm">
-						<div>
-							<div class="font-medium">{plan.name}</div>
-							<div class="text-xs text-muted-foreground">{plan.points} 点数</div>
+					<button onclick={() => handleRecharge(plan)} disabled={recharging} class="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 transition-colors disabled:opacity-50">
+						<div class="text-left">
+							<div class="text-sm font-medium">{plan.name}</div>
+							<div class="text-xs text-muted-foreground">⚡{plan.points} 点数</div>
 						</div>
-						<Icon icon="mdi:open-in-new" class="size-4 text-muted-foreground" />
-					</a>
+						<span class="text-sm font-medium text-amber-600 dark:text-amber-400">{recharging ? '处理中...' : '立即充值 →'}</span>
+					</button>
 				{/each}
 			{/if}
 		</div>
