@@ -33,7 +33,8 @@
 		prose-hr:border-border
 		prose-th:border prose-th:border-border prose-th:bg-muted
 		prose-td:border prose-td:border-border
-		prose-img:rounded-lg"
+		prose-img:rounded-lg
+		prose-table:block prose-table:overflow-x-auto prose-table:max-w-full"
 >
 	{@html html}
 </div>
