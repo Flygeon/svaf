@@ -116,6 +116,30 @@
 	let myImagesLoading = $state(false);
 	let myImagesLoaded = $state(false);
 	let myQueueItems = $state<Array<{ id: number; status: string; created_at: number; started_at?: number; finished_at?: number; error?: string; position?: number | null }>>([]);
+	let queueErrors = $state<Record<string, string>>({});
+
+	$effect(() => {
+		if (typeof localStorage === 'undefined') return;
+		try {
+			const saved = localStorage.getItem('draw-queue-errors');
+			if (saved) queueErrors = JSON.parse(saved);
+		} catch {}
+	});
+
+	function saveQueueErrors() {
+		if (typeof localStorage === 'undefined') return;
+		localStorage.setItem('draw-queue-errors', JSON.stringify(queueErrors));
+	}
+
+	function dismissQueueError(id: number) {
+		const key = String(id);
+		if (queueErrors[key]) {
+			const updated = { ...queueErrors };
+			delete updated[key];
+			queueErrors = updated;
+			saveQueueErrors();
+		}
+	}
 	let myQueueLoading = $state(false);
 	let prevQueueIds = new Set<number>();
 	let notifiedIds = new Set<number>();
@@ -454,8 +478,27 @@ async function startGeneration(mode = 'wai') {
 						});
 					}
 				}
+				// Persist failed errors, remove resolved ones
+				let changed = false;
+				const failedIds = new Set<string>();
+				for (const item of now) {
+					const key = String(item.id);
+					if (item.status === 'failed' && item.error) {
+						failedIds.add(key);
+						if (!queueErrors[key]) {
+							queueErrors = { ...queueErrors, [key]: item.error };
+							changed = true;
+						}
+					}
+					if (item.status === 'done' && queueErrors[key]) {
+						const u = { ...queueErrors };
+						delete u[key];
+						queueErrors = u;
+						changed = true;
+					}
+				}
+				if (changed) saveQueueErrors();
 				prevQueueIds = prevActive;
-				// 只有数据变化时才更新，避免闪烁
 				const same = myQueueItems.length === showItems.length && myQueueItems.every((old, i) => old.id === showItems[i].id && old.status === showItems[i].status);
 				if (!same) myQueueItems = showItems;
 		} catch {
@@ -844,7 +887,11 @@ async function startGeneration(mode = 'wai') {
 										{:else if item.status === 'done'}
 											<Icon icon="mdi:check-circle" class="size-4 text-green-500" /><span class="flex-1">生图完成</span>
 										{:else if item.status === 'failed'}
-											<Icon icon="mdi:alert-circle" class="size-4 text-red-500" /><span class="flex-1 truncate">{item.error || '生图失败'}</span>
+											<Icon icon="mdi:alert-circle" class="size-4 text-red-500 shrink-0" />
+											<div class="flex-1 min-w-0 leading-tight">
+												<div class="font-medium text-red-600 dark:text-red-400">生图失败</div>
+												<div class="text-[10px] text-red-500/70 break-words">{item.error || '未知错误'}</div>
+											</div>
 										{:else if item.status === 'cancelled'}
 											<Icon icon="mdi:cancel" class="size-4 text-muted-foreground" /><span class="flex-1">已取消</span>
 										{:else}
@@ -856,6 +903,16 @@ async function startGeneration(mode = 'wai') {
 							{:else}
 								<div class="text-xs text-muted-foreground py-3 text-center">暂无排队任务</div>
 							{/if}
+							{#each Object.entries(queueErrors) as [id, err]}
+								<div class="flex items-start gap-2 text-xs border border-red-200 bg-red-50 dark:bg-red-950/30 dark:border-red-800 rounded-lg px-3 py-2">
+									<Icon icon="mdi:alert-circle" class="size-4 text-red-500 shrink-0 mt-0.5" />
+									<div class="flex-1 min-w-0 leading-tight">
+										<div class="font-medium text-red-600 dark:text-red-400">#{id} 生图失败</div>
+										<div class="text-[10px] text-red-500/70 break-words">{err}</div>
+									</div>
+									<button onclick={() => dismissQueueError(Number(id))} class="size-5 flex items-center justify-center rounded text-muted-foreground hover:text-red-500 shrink-0" title="忽略"><Icon icon="mdi:close" class="size-3.5" /></button>
+								</div>
+							{/each}
 						</div>
 						<div class="flex items-center justify-between">
 							<h3 class="text-sm font-medium flex items-center gap-1.5"><Icon icon="mdi:account-outline" class="size-4" />我的图片 <span class="text-xs text-muted-foreground">({myImages.length}/{myImagesTotal})</span></h3>
