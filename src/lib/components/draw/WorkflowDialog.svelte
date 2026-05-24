@@ -42,7 +42,7 @@
 			</Button>
 		{/snippet}
 	</Dialog.Trigger>
-	<Dialog.Content class="sm:max-w-full max-w-full w-screen h-screen max-h-screen m-0 rounded-none p-4 flex flex-col">
+	<Dialog.Content class="sm:max-w-full max-w-full w-dvw h-dvh max-h-dvh m-0 rounded-none p-4 flex flex-col">
 		<Dialog.Header class="shrink-0 min-h-10">
 			<Dialog.Title class="flex items-center gap-2">
 				<Icon icon="mdi:cog-outline" class="size-5" />
