@@ -15,6 +15,7 @@
 	let username = $state('');
 	let email = $state('');
 	let password = $state('');
+	let showPassword = $state(false);
 	let loading = $state(false);
 	let status = $state('');
 	let turnstileEnabled = $state(false);
@@ -135,16 +136,21 @@
 
 			<div class="space-y-2">
 				<Label for="password">密码（8-16 个字符）</Label>
-				<Input
-					id="password"
-					type="password"
-					bind:value={password}
-					placeholder="设置登录密码"
-					autocomplete="new-password"
-					minlength={8}
-					maxlength={16}
-					onkeydown={(e) => e.key === 'Enter' && submit()}
-				/>
+				<div class="relative">
+					<Input
+						id="password"
+						type={showPassword ? 'text' : 'password'}
+						bind:value={password}
+						placeholder="设置登录密码"
+						autocomplete="new-password"
+						minlength={8}
+						maxlength={16}
+						onkeydown={(e) => e.key === 'Enter' && submit()}
+					/>
+					<button onclick={() => showPassword = !showPassword} type="button" class="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-0.5" tabindex="-1">
+						<Icon icon={showPassword ? 'mdi:eye-off-outline' : 'mdi:eye-outline'} class="size-4" />
+					</button>
+				</div>
 			</div>
 
 			{#if turnstileEnabled && turnstileSiteKey}
