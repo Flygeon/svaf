@@ -318,7 +318,6 @@
 	function handleWorkflowSelect(wf: DrawWorkflow) {
 		workflowPath = wf.path;
 		workflowName = wf.path.split('/').pop()?.replace(/\.(json|txt)$/, '') || '';
-		inlineWorkflow = null;
 		forkSeed = undefined;
 		sameSeed = false;
 	}
