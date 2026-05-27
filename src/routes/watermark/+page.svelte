@@ -96,7 +96,7 @@
 
 			<div class="space-y-1.5">
 				<Label class="text-xs">类型</Label>
-				<Select.Root bind:value={mode}>
+				<Select.Root type="single" bind:value={mode}>
 					<Select.Trigger class="w-full">
 						{mode === 'single' ? '单个水印' : '全屏平铺'}
 					</Select.Trigger>
@@ -119,7 +119,7 @@
 				{#if mode === 'single'}
 					<div class="space-y-1.5">
 						<Label class="text-xs">位置</Label>
-						<Select.Root bind:value={position}>
+						<Select.Root type="single" bind:value={position}>
 							<Select.Trigger class="w-full">
 								{position}
 							</Select.Trigger>
