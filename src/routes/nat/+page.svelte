@@ -3,7 +3,6 @@
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { Button } from '$lib/components/ui/button';
 	import Icon from '@iconify/svelte';
-	import PageViews from '$lib/components/PageViews.svelte';
 
 	import { siteConfig } from '$lib/config/site';
 	const API_URL = siteConfig.services.nat;
@@ -209,7 +208,6 @@
 					<Icon icon="mdi:lan-check" class="size-6 text-primary" />
 					NAT 类型检测
 				</CardTitle>
-				<PageViews pathname="/nat/" class="text-sm text-muted-foreground" />
 			</div>
 		</CardHeader>
 		<CardContent class="space-y-2">

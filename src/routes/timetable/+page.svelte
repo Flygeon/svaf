@@ -4,7 +4,6 @@
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { Badge } from '$lib/components/ui/badge';
 	import Icon from '@iconify/svelte';
-	import PageViews from '$lib/components/PageViews.svelte';
 	import { siteConfig } from '$lib/config/site';
 	import type { PageData } from './$types';
 	
@@ -41,7 +40,6 @@
 				<div class="flex items-center gap-2 text-muted-foreground">
 					<p>共 {data.viewModel.maxWeek} 周</p>
 					<span>·</span>
-					<PageViews pathname="/timetable/" class="text-sm" />
 				</div>
 			</div>
 			<a href="/">

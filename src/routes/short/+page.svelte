@@ -7,7 +7,6 @@
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import { Separator } from '$lib/components/ui/separator';
 	import Icon from '@iconify/svelte';
-	import PageViews from '$lib/components/PageViews.svelte';
 	import { siteConfig } from '$lib/config/site';
 	import { ZW_PREFIX, encodeUrl, decodeUrl, visualizeZwChars } from '$lib/utils/zwShortLink';
 
@@ -100,7 +99,6 @@
 					<Icon icon="mynaui:zero-circle-solid" class="size-6 text-primary" />
 					零宽短链生成器
 				</CardTitle>
-				<PageViews pathname="/short/" class="text-sm text-muted-foreground" />
 			</div>
 		</CardHeader>
 		<CardContent>

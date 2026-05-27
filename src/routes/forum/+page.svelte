@@ -13,7 +13,6 @@
 	import Icon from '@iconify/svelte';
 	import EnvironmentSwitcher from '$lib/components/forum/EnvironmentSwitcher.svelte';
 	import PostList from '$lib/components/forum/PostList.svelte';
-	import PageViews from '$lib/components/PageViews.svelte';
 	import { getCategories } from '$lib/forum/api/categories';
 	import {
 		type ForumPostListQuery,
@@ -260,7 +259,6 @@
 					<Icon icon="mdi:forum" class="size-6 text-primary" />
 					论坛
 				</CardTitle>
-				<PageViews pathname="/forum/" class="text-sm text-muted-foreground" />
 			</div>
 		</CardHeader>
 		<CardContent class="space-y-4">

@@ -8,7 +8,6 @@
 	import { Switch } from '$lib/components/ui/switch';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import Icon from '@iconify/svelte';
-	import PageViews from '$lib/components/PageViews.svelte';
 	import { siteConfig } from '$lib/config/site';
 
 	type ToolMode = 'prism' | 'shadow';
@@ -573,7 +572,6 @@
 					<Icon icon="mdi:layers-triple" class="size-6 text-primary" />
 					光棱坦克 / 幻影坦克
 				</CardTitle>
-				<PageViews pathname="/ptg/" class="text-sm text-muted-foreground" />
 			</div>
 		</CardHeader>
 		<CardContent>

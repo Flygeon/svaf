@@ -4,7 +4,6 @@
 	import { Tabs, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
 	import { Button } from '$lib/components/ui/button';
 	import Icon from '@iconify/svelte';
-	import PageViews from '$lib/components/PageViews.svelte';
 	import PhotoSwipeLightbox from 'photoswipe/lightbox';
 	import 'photoswipe/style.css';
 
@@ -232,7 +231,6 @@
 				</CardTitle>
 				<div class="flex items-center gap-3 text-sm text-muted-foreground">
 					<span>共 {counts[currentType] || 0} 张</span>
-					<PageViews pathname="/gallery/" class="text-sm" />
 				</div>
 			</div>
 		</CardHeader>

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import CoverGenerator from '$lib/components/CoverGenerator.svelte';
 	import { siteConfig } from '$lib/config/site';
-	import PageViews from '$lib/components/PageViews.svelte';
 </script>
 
 <svelte:head>
@@ -14,7 +13,6 @@
 		<div class="flex items-center gap-2 text-muted-foreground">
 			<p>在线生成精美的封面图片</p>
 			<span>·</span>
-			<PageViews pathname="/cover/" class="text-sm" />
 		</div>
 	</div>
 

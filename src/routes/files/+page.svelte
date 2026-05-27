@@ -3,7 +3,6 @@
 	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import Icon from '@iconify/svelte';
-	import PageViews from '$lib/components/PageViews.svelte';
 	import FileExplorer from './FileExplorer.svelte';
 	import OneDriveExplorer from './OneDriveExplorer.svelte';
 	import { siteConfig } from '$lib/config/site';
@@ -25,7 +24,6 @@
 					<Icon icon="mdi:folder-open" class="size-6 text-primary" />
 					文件索引
 				</CardTitle>
-				<PageViews pathname="/files/" class="text-sm text-muted-foreground" />
 			</div>
 		</CardHeader>
 		<CardContent class="space-y-4">

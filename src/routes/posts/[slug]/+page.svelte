@@ -6,7 +6,6 @@
 	import { siteConfig } from '$lib/config/site';
 	import ImageViewer from '$lib/components/ImageViewer.svelte';
 	import Giscus from '$lib/components/Giscus.svelte';
-	import PageViews from '$lib/components/PageViews.svelte';
 	import PostToc from '$lib/components/PostToc.svelte';
 	import { NAV_HEIGHT } from '$lib/constants';
 	import { highlightCodeBlocksIn, switchHighlightTheme } from '$lib/utils/highlight';

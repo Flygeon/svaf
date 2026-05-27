@@ -5,7 +5,6 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import Icon from '@iconify/svelte';
-	import PageViews from '$lib/components/PageViews.svelte';
 
 	import { siteConfig } from '$lib/config/site';
 	const LONG_DOMAIN = siteConfig.services.longDomain;
@@ -95,7 +94,6 @@
 					<Icon icon="mdi:link-variant-plus" class="size-6 text-primary" />
 					长链生成器
 				</CardTitle>
-				<PageViews pathname="/long/" class="text-sm text-muted-foreground" />
 			</div>
 		</CardHeader>
 		<CardContent>

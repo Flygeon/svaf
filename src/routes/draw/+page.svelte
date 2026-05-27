@@ -17,7 +17,6 @@
 	let announcementTitle = $state('');
 	let announcementOpen = $state(false);
 
-	import PageViews from '$lib/components/PageViews.svelte';
 
 	import EnvironmentSwitcher from '$lib/components/draw/EnvironmentSwitcher.svelte';
 	import WorkflowDialog from '$lib/components/draw/WorkflowDialog.svelte';
@@ -738,7 +737,6 @@ async function startGeneration(mode = 'wai') {
 				<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
 				使用技巧
 			</a>
-				<PageViews pathname="/draw/" class="text-sm text-muted-foreground" />
 			{#if onlineCount > 0}
 				<Badge variant="secondary" class="text-xs">
 					<Icon icon="mdi:account-multiple" class="size-3 mr-0.5" />
