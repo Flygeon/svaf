@@ -39,7 +39,6 @@
 				<h1 class="text-4xl font-bold mb-2">{data.viewModel.tableName}</h1>
 				<div class="flex items-center gap-2 text-muted-foreground">
 					<p>共 {data.viewModel.maxWeek} 周</p>
-					<span>·</span>
 				</div>
 			</div>
 			<a href="/">

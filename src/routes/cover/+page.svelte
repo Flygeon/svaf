@@ -12,7 +12,6 @@
 		<h1 class="text-3xl font-bold mb-2">封面制作</h1>
 		<div class="flex items-center gap-2 text-muted-foreground">
 			<p>在线生成精美的封面图片</p>
-			<span>·</span>
 		</div>
 	</div>
 
