@@ -23,6 +23,9 @@
 
 	let agreed = $state(false);
 	let overlayContent = $state<string | null>(null);
+	let readAgreement = $state(false);
+	let readPrivacy = $state(false);
+	let canAgree = $derived(readAgreement && readPrivacy);
 
 	const STORAGE_KEY = 'cookie-consent-preferences';
 	const CONSENT_VERSION = '2.0';
@@ -105,6 +108,17 @@
 		savePreferences();
 	}
 
+	function withdrawConsent() {
+		try {
+			localStorage.removeItem(STORAGE_KEY);
+		} catch {}
+		agreed = false;
+		readAgreement = false;
+		readPrivacy = false;
+		showBanner = true;
+		showSettings = false;
+	}
+
 	function applyConsent() {
 		window.dispatchEvent(new CustomEvent('cookie-consent-updated', {
 			detail: preferences
@@ -132,15 +146,18 @@
 							点击"接受全部"即表示您同意我们使用所有 Cookie，您也可以点击"自定义设置"来选择您希望启用的 Cookie 类型。
 						</p>
 
-			<label class="flex items-start gap-3 p-3 rounded-lg border bg-muted/30 cursor-pointer">
-				<Checkbox bind:checked={agreed} class="mt-0.5" />
+			<label class="flex items-start gap-3 p-3 rounded-lg border bg-muted/30">
+				<Checkbox bind:checked={agreed} disabled={!canAgree} class="mt-0.5" />
 				<div class="text-xs space-y-1">
 					<span>我已阅读并同意</span>
 					<button type="button" class="text-primary underline hover:text-primary/80" onclick={() => overlayContent = 'agreement'}>《用户协议》</button>
 					<span>和</span>
-					<button type="button" class="text-primary underline hover:text-primary/80" onclick={() => overlayContent = 'privacy'}>《隐私政策》</button>
-				</div>
-			</label>
+				<button type="button" class="text-primary underline hover:text-primary/80" onclick={() => overlayContent = 'privacy'}>《隐私政策》</button>
+			</div>
+			{#if !canAgree}
+				<div class="text-[10px] text-muted-foreground mt-1">请先点击上方链接阅读并确认同意协议</div>
+			{/if}
+		</label>
 
 						<div class="flex flex-wrap gap-3">
 							<Button onclick={acceptAll} disabled={!agreed}>
@@ -173,14 +190,17 @@
 		</Dialog.Header>
 
 		<div class="space-y-6 py-4">
-						<label class="flex items-start gap-3 p-3 rounded-lg border bg-muted/30 cursor-pointer">
-							<Checkbox bind:checked={agreed} class="mt-0.5" />
+						<label class="flex items-start gap-3 p-3 rounded-lg border bg-muted/30">
+							<Checkbox bind:checked={agreed} disabled={!canAgree} class="mt-0.5" />
 							<div class="text-xs space-y-1">
 								<span>我已阅读并同意</span>
 								<button type="button" class="text-primary underline hover:text-primary/80" onclick={() => overlayContent = 'agreement'}>《用户协议》</button>
 								<span>和</span>
 								<button type="button" class="text-primary underline hover:text-primary/80" onclick={() => overlayContent = 'privacy'}>《隐私政策》</button>
 							</div>
+							{#if !canAgree}
+								<div class="text-[10px] text-muted-foreground mt-1">请先点击上方链接阅读并确认同意协议</div>
+							{/if}
 						</label>
 
 			<!-- 必要 Cookie -->
@@ -235,7 +255,11 @@
 			</div>
 		</div>
 
-		<Dialog.Footer>
+		<Dialog.Footer class="flex-wrap gap-2">
+			<Button variant="ghost" size="sm" onclick={withdrawConsent} class="text-destructive hover:text-destructive">
+				<Icon icon="mdi:close-circle-outline" class="size-3.5 mr-1" />撤回同意
+			</Button>
+			<div class="flex-1" />
 			<Button variant="outline" onclick={acceptNecessary} disabled={!agreed}>
 				仅必要 Cookie
 			</Button>
@@ -278,7 +302,7 @@
 				{/if}
 			</div>
 			<div class="mt-6 flex justify-center">
-				<button type="button" class="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90" onclick={() => overlayContent = null}>
+				<button type="button" class="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90" onclick={() => { if (overlayContent === 'agreement') readAgreement = true; if (overlayContent === 'privacy') readPrivacy = true; overlayContent = null; }}>
 					我已阅读
 				</button>
 			</div>
