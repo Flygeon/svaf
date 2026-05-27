@@ -55,6 +55,8 @@
 				if (data.version === CONSENT_VERSION && data.agreed) {
 					preferences = data.preferences;
 					agreed = true;
+					readAgreement = true;
+					readPrivacy = true;
 					applyConsent();
 					return;
 				}
