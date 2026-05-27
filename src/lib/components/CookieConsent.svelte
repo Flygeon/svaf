@@ -130,7 +130,7 @@
 
 <!-- Cookie 横幅 -->
 {#if showBanner}
-	<div class="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
+	<div class="fixed inset-0 z-50 bg-background/80">
 		<div class="fixed bottom-0 left-0 right-0 p-4 md:p-6">
 			<Card class="mx-auto max-w-3xl">
 				<CardHeader class="pb-2">
