@@ -914,10 +914,6 @@ async function startGeneration(mode = 'wai') {
 				</TabsContent>
 
 				<TabsContent value="saloon" class="mt-4">
-					<div class="flex gap-1 mb-3">
-						<button class="flex-1 py-1.5 text-xs rounded border {genTxtSubTab === 'wai' ? 'bg-primary text-primary-foreground border-primary' : 'bg-muted text-muted-foreground border-transparent'}" onclick={() => genTxtSubTab = 'wai'}>WAI</button>
-						<button class="flex-1 py-1.5 text-xs rounded border {genTxtSubTab === 'anima' ? 'bg-primary text-primary-foreground border-primary' : 'bg-muted text-muted-foreground border-transparent'}" onclick={() => genTxtSubTab = 'anima'}>Anima</button>
-					</div>
 					<SaloonTab {workflowPath} {styleTags} {negativePrompt} {width} {height} {turnstileToken} pointsCostSubmit={genTxtSubTab === 'anima' ? (pointsConfig?.text_to_image_anima ?? 20) : (pointsConfig?.text_to_image ?? 0)} mode={genTxtSubTab} />
 				</TabsContent>
 
