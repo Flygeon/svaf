@@ -1071,6 +1071,32 @@ async function startGeneration(mode = 'wai') {
 />
 </div>
 
+<Dialog.Root open={rechargeOpen} onOpenChange={(o) => rechargeOpen = o}>
+	<Dialog.Content class="max-w-sm">
+		<Dialog.Header>
+			<Dialog.Title class="flex items-center gap-2">
+				<Icon icon="mdi:wallet-plus-outline" class="size-5" />
+				充值
+			</Dialog.Title>
+		</Dialog.Header>
+		<div class="space-y-2 px-6 pb-4">
+			{#if plans.length === 0}
+				<div class="text-xs text-muted-foreground py-4 text-center">暂无充值方案</div>
+			{:else}
+				{#each plans as plan}
+					<button onclick={() => handleRecharge(plan)} disabled={recharging} class="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 transition-colors disabled:opacity-50">
+						<div class="text-left">
+							<div class="text-sm font-medium">{plan.name}</div>
+							<div class="text-xs text-muted-foreground">⚡{plan.points} 点数</div>
+						</div>
+						<span class="text-sm font-medium text-amber-600 dark:text-amber-400">{recharging ? '处理中...' : '立即充值 →'}</span>
+					</button>
+				{/each}
+			{/if}
+		</div>
+	</Dialog.Content>
+</Dialog.Root>
+
 <Dialog.Root open={announcementOpen} onOpenChange={(o) => { if (!o) { announcementOpen = false; try { sessionStorage.setItem('draw-announcement-dismissed', '1'); } catch {} } }}>
 	<Dialog.Content class="max-w-md">
 		<Dialog.Header>
