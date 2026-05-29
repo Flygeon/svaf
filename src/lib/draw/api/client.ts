@@ -305,3 +305,53 @@ export function getImageProxyUrl(filename: string, subfolder = '', type = 'outpu
 	url.searchParams.set('type', type);
 	return _appendToken(url);
 }
+
+export interface ChatPayload {
+	message: string;
+	workflow_path?: string;
+	style_tags?: string;
+	system_prompt: string;
+	negative_prompt?: string;
+	history: Array<{ role: string; content: string }>;
+}
+
+/**
+ * 角色扮演聊天 — SSE 流式请求。
+ * 返回原始 Response，调用方自行解析 SSE 事件流。
+ */
+export async function chatRequest(payload: ChatPayload): Promise<Response> {
+	await resolveApiRedirect();
+	const token = forumAuth.getToken();
+	if (!token) {
+		throw new DrawApiError(401, {
+			message: '未检测到登录令牌，请先在论坛登录。',
+			code: 'DRAW_AUTH_TOKEN_MISSING'
+		});
+	}
+	const baseUrl = get(drawEnv.baseUrl);
+	const url = buildUrl('/api/draw/chat', undefined, baseUrl);
+	const headers = new Headers({
+		'Content-Type': 'application/json',
+		'Authorization': `Bearer ${token}`,
+	});
+	const response = await fetch(url, {
+		method: 'POST',
+		headers,
+		body: JSON.stringify(payload),
+	});
+	if (!response.ok) {
+		const body = await response.json().catch(() => ({}));
+		const payload_err = (typeof body === 'object' && body
+			? body
+			: { message: typeof body === 'string' ? body : undefined }) as DrawApiErrorPayload;
+		if (response.status === 401) {
+			forumAuth.clear();
+			if (typeof window !== 'undefined') {
+				const loginUrl = '/forum/auth/login/?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+				window.location.href = loginUrl;
+			}
+		}
+		throw new DrawApiError(response.status, payload_err);
+	}
+	return response;
+}

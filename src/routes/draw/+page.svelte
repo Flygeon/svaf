@@ -25,6 +25,7 @@
 	
 	import FeaturedTab from '$lib/components/draw/FeaturedTab.svelte';
 	import Img2imgTab from '$lib/components/draw/Img2imgTab.svelte';
+	import SaloonTab from '$lib/components/draw/SaloonTab.svelte';
 		import ImageLightbox from '$lib/components/draw/ImageLightbox.svelte';
 
 	// State
@@ -196,7 +197,7 @@
 
 	// Tab state
 	let activeTab = $state(location.hash?.slice(1) || 'generate');
-	let genSubTab = $state(location.hash?.includes('img2img') ? 'img2img' : 'txt2img');
+	let genSubTab = $state(location.hash?.includes('img2img') ? 'img2img' : location.hash?.includes('saloon') ? 'saloon' : 'txt2img');
 	let genTxtSubTab = $state((typeof localStorage !== 'undefined' && localStorage.getItem('draw-txt-sub-tab')) || 'wai');
 
 	$effect(() => {
@@ -208,7 +209,7 @@
 		if (typeof location !== 'undefined') {
 			const h = location.hash?.slice(1);
 			if (h === 'mine' || h === 'featured' || h === 'generate') activeTab = h;
-			if (h === 'img2img' || h === 'txt2img') genSubTab = h;
+			if (h === 'img2img' || h === 'txt2img' || h === 'saloon') genSubTab = h;
 		}
 	});
 
@@ -842,6 +843,10 @@ async function startGeneration(mode = 'wai') {
 						<Icon icon="mdi:image-edit-outline" class="size-4 mr-1" />
 						图生图
 					</TabsTrigger>
+					<TabsTrigger value="saloon" class="flex-1">
+						<Icon icon="mdi:chat-outline" class="size-4 mr-1" />
+						酒馆
+					</TabsTrigger>
 				</TabsList>
 
 				<TabsContent value="txt2img" class="space-y-4 mt-4">
@@ -906,6 +911,10 @@ async function startGeneration(mode = 'wai') {
 
 				<TabsContent value="img2img" class="mt-4">
 					<Img2imgTab bind:turnstileToken bind:turnstileTick pointsCostTranslate={pointsConfig?.llm_translate ?? 0} pointsCostSubmit={pointsConfig?.image_to_image ?? 0} turnstileEnabled={pointsConfig?.turnstile_enabled ?? true} />
+				</TabsContent>
+
+				<TabsContent value="saloon" class="mt-4">
+					<SaloonTab {workflowPath} {styleTags} />
 				</TabsContent>
 
 			</Tabs>
