@@ -41,7 +41,7 @@ let selectedPresetIdx = $state<number>(-1);
 let presetName = $state('');
 let systemPrompt = $state('');
 let chatMessages = $state<ChatMessage[]>([]);
-let chatHistory = $state<Array<{ role: string; content: string; imageUrls?: string[] }>>([]);
+let chatHistory = $state<Array<{ role: string; content: string; imageUrls?: string[]; systemPrompt?: string }>>([]);
 let inputText = $state('');
 let sending = $state(false);
 let settingsOpen = $state(true);
@@ -64,11 +64,20 @@ async function loadPresets() {
 
 onMount(async () => {
 	await loadPresets();
-	try {
+		try {
 		const res = await fetchChatHistory();
 		chatHistory = res.items || [];
 		chatMessages = chatHistory.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content, imageUrls: m.imageUrls || [] }));
-		if (chatMessages.length > 0) conversationStarted = true;
+		if (chatMessages.length > 0) {
+			conversationStarted = true;
+			// 恢复最后一条消息携带的 systemPrompt
+			for (let i = chatHistory.length - 1; i >= 0; i--) {
+				if (chatHistory[i].systemPrompt) {
+					systemPrompt = chatHistory[i].systemPrompt!;
+					break;
+				}
+			}
+		}
 	} catch {}
 });
 
@@ -199,7 +208,7 @@ async function sendMessage() {
 
 		chatHistory = [...chatHistory, { role: 'user', content: msg }, { role: 'assistant', content: textContent }];
 		if (chatHistory.length > 40) chatHistory = chatHistory.slice(-40);
-		try { await appendChatHistory([{ role: 'user', content: msg }, { role: 'assistant', content: textContent }]); } catch {}
+		try { await appendChatHistory([{ role: 'user', content: msg, systemPrompt }, { role: 'assistant', content: textContent }]); } catch {}
 	} catch (e: any) {
 		chatMessages = chatMessages.map((m, i) =>
 			i === assistantIdx ? { ...m, content: `❌ ${e.message || '请求失败'}`, streaming: false } : m
