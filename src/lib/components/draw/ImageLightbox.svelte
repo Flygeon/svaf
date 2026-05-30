@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import { resolveUsername } from '$lib/draw/stores/username';
+	import { getImageDownloadUrl } from '$lib/draw/api/client';
 
 	let {
 		open = false,
@@ -76,6 +77,19 @@
 		const p = getPath(img.src);
 		if (p) onrecommend?.(p);
 	}
+
+	function handleDownload() {
+		const img = images[index];
+		if (!img) return;
+		const p = getPath(img.src);
+		if (!p) return;
+		const a = document.createElement('a');
+		a.href = getImageDownloadUrl(p);
+		a.download = '';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+	}
 </script>
 
 <svelte:window onkeydown={handleKey} />
@@ -128,6 +142,14 @@
 
 		<!-- Bottom bar -->
 		<div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4">
+			<button
+				class="text-white/90 text-sm bg-white/10 px-3 py-1.5 rounded hover:bg-white/20 transition-colors flex items-center gap-1.5"
+				onclick={handleDownload}
+				title="下载原图（不经过 Webp 转换）"
+			>
+				<Icon icon="mdi:download" class="size-4" />
+				下载原图
+			</button>
 			{#if images[index].creator_id}
 				<a
 					href={`/forum/u/?id=${images[index].creator_id}`}

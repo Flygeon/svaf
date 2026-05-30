@@ -274,6 +274,14 @@ export function getImageUrl(path: string, full = false): string {
 	return _appendToken(url);
 }
 
+export function getImageDownloadUrl(path: string): string {
+  const baseUrl = get(drawEnv.baseUrl);
+  const url = new URL('/api/output/file', baseUrl);
+  url.searchParams.set('path', path);
+  url.searchParams.set('raw', '1');
+  return _appendToken(url);
+}
+
 export function getThumbnailUrl(path: string): string {
 	const baseUrl = get(drawEnv.baseUrl);
 	const url = new URL('/api/thumbnail', baseUrl);
