@@ -9,7 +9,7 @@
 	import { forumAuth } from '$lib/forum/stores/auth';
 	import { drawEnv, apiError, apiStatus, resolveApiRedirect } from '$lib/draw/stores/env';
 	import { connectStatusWs } from '$lib/draw/api/ws';
-	import { fetchMyImages, getImageUrl, getImageProxyUrl, forkOutputImage, recommendImage, deleteMyImage, fetchMyRecommendations, addToQueue, fetchMyQueue, fetchWalletBalance, createWalletOrder, fetchPlans, fetchPointsConfig, fetchWorkflowDetail, fetchAnnouncement, fetchStyles } from '$lib/draw/api/client';
+	import { fetchMyImages, getImageUrl, getImageProxyUrl, forkOutputImage, recommendImage, deleteMyImage, fetchMyRecommendations, addToQueue, fetchMyQueue, fetchWalletBalance, createWalletOrder, fetchPlans, fetchPointsConfig, fetchWorkflowDetail, fetchAnnouncement, fetchStyles, fetchTtsMyRecords, getTtsRecordDownloadUrl, deleteTtsMyRecord } from '$lib/draw/api/client';
 import { clearMyImages } from '$lib/draw/api/client';
 	import { consumeFork } from '$lib/draw/stores/fork';
 	import { onMount, onDestroy } from 'svelte';
@@ -121,6 +121,15 @@ import { clearMyImages } from '$lib/draw/api/client';
 	let myQueueItems = $state<Array<{ id: number; status: string; created_at: number; started_at?: number; finished_at?: number; error?: string; position?: number | null }>>([]);
 	let queueErrors = $state<Record<string, string>>({});
 	let dismissedErrors = $state<Set<string>>(new Set());
+	let ttsMyRecords = $state<Array<{ id: number; user_id: number; text: string; refText: string | null; xVectorMode: boolean; language: string; audioDuration: number; cost: number; outputPath: string | null; created_at: number; finished_at: number }>>([]);
+	let ttsMyRecordsLoading = $state(false);
+	let ttsMyRecordsLoaded = $state(false);
+
+	async function loadTtsMyRecords() {
+		ttsMyRecordsLoading = true;
+		try { ttsMyRecords = (await fetchTtsMyRecords()).items; ttsMyRecordsLoaded = true; } catch { ttsMyRecords = []; }
+		finally { ttsMyRecordsLoading = false; }
+	}
 
 	$effect(() => {
 		if (typeof localStorage === 'undefined') return;
@@ -238,6 +247,7 @@ import { clearMyImages } from '$lib/draw/api/client';
 	$effect(() => {
 		if (activeTab === 'mine' && isLoggedIn) {
 			if (!myImagesLoaded) loadMyImages();
+			if (!ttsMyRecordsLoaded) loadTtsMyRecords();
 			myQueueLoading = true;
 			loadMyQueue();
 			queueTimer = setInterval(loadMyQueue, 1000);
@@ -1066,6 +1076,40 @@ async function startGeneration(mode = 'wai') {
 								</div>
 							{/if}
 						{/if}
+
+						<!-- TTS History -->
+						<div class="pt-4 border-t mt-4">
+							<div class="flex items-center justify-between mb-2">
+								<h3 class="text-sm font-medium flex items-center gap-1.5"><Icon icon="mdi:voice" class="size-4" />TTS 记录</h3>
+								<button onclick={() => { ttsMyRecordsLoaded = false; loadTtsMyRecords(); }} class="size-7 flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-accent transition-colors" title="刷新"><Icon icon="mdi:refresh" class="size-3.5" /></button>
+							</div>
+							{#if ttsMyRecordsLoading}
+								<div class="text-xs text-muted-foreground py-4 text-center">加载中...</div>
+							{:else if !isLoggedIn}
+								<div class="text-xs text-muted-foreground py-4 text-center">请先登录</div>
+							{:else if ttsMyRecords.length === 0}
+								<div class="text-xs text-muted-foreground py-4 text-center">你还没有生成过 TTS</div>
+							{:else}
+								<div class="space-y-2">
+									{#each ttsMyRecords as rec}
+										<div class="text-xs border rounded-lg px-3 py-2 space-y-1">
+											<div class="flex items-center gap-2 text-muted-foreground">
+												<span class="truncate max-w-[200px]">{rec.text}</span>
+												<span class="ml-auto shrink-0">⚡{rec.cost} | {rec.language} | {rec.audioDuration.toFixed(1)}s</span>
+											</div>
+											{#if rec.refText}
+												<div class="truncate text-muted-foreground">参考: {rec.refText}</div>
+											{/if}
+											<div class="flex items-center gap-2 text-muted-foreground">
+												<span>{new Date(rec.finished_at * 1000).toLocaleString()}</span>
+												<a href={getTtsRecordDownloadUrl(rec.id)} download class="underline text-primary ml-auto">下载</a>
+												<button onclick={async () => { if (confirm('确定删除这条 TTS 记录？')) { await deleteTtsMyRecord(rec.id); ttsMyRecords = ttsMyRecords.filter(r => r.id !== rec.id); } }} class="underline text-red-500">删除</button>
+											</div>
+										</div>
+									{/each}
+								</div>
+							{/if}
+						</div>
 					</div>
 				{/if}
 				</div>

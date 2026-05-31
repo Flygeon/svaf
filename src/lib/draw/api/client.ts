@@ -451,3 +451,25 @@ export function getTtsResultUrl(id: number): string {
 	if (token) url.searchParams.set('token', token);
 	return url.toString();
 }
+
+export async function fetchTtsMyRecords() {
+	return drawRequest<{ items: Array<{ id: number; user_id: number; text: string; refText: string | null; xVectorMode: boolean; language: string; audioDuration: number; cost: number; outputPath: string | null; created_at: number; finished_at: number }>; total: number }>(
+		'/api/draw/tts/my-records',
+		{ requiresAuth: true }
+	);
+}
+
+export function getTtsRecordDownloadUrl(id: number): string {
+	const token = forumAuth.getToken();
+	const baseUrl = get(drawEnv.baseUrl);
+	const url = new URL(`/api/draw/tts/record-download/${id}`, baseUrl);
+	if (token) url.searchParams.set('token', token);
+	return url.toString();
+}
+
+export async function deleteTtsMyRecord(id: number) {
+	return drawRequest<{ ok: boolean }>(`/api/draw/tts/my-record/${id}`, {
+		method: 'DELETE',
+		requiresAuth: true,
+	});
+}

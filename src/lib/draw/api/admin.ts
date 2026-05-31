@@ -259,6 +259,10 @@ export async function resolveRecommendations(recIds: string[], action: 'approve'
 		return drawRequest<{ items: Array<{ id: number; user_id: number; text: string; refText: string | null; xVectorMode: boolean; language: string; audioDuration: number; cost: number; outputPath: string | null; created_at: number; finished_at: number }> }>('/api/draw/admin/tts-records');
 	}
 
+	export async function deleteTtsRecord(id: number) {
+		return drawRequest<{ ok: boolean }>('/api/draw/admin/tts-record/' + id, { method: 'DELETE' });
+	}
+
 	export async function savePointsConfig(cfg: { text_to_image: number; image_to_image: number; llm_translate: number; signup_bonus?: number; text_to_image_anima?: number; tts_generate?: number; tts_per_char?: number; tts_per_sec?: number }) {
 		return drawRequest<{ ok: boolean; config: any }>('/api/draw/admin/points-config', {
 			method: 'POST',
