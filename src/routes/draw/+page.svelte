@@ -606,6 +606,10 @@ async function startGeneration(mode = 'wai') {
   }
 
   function pushToShortest(path: string) {
+    // Skip if already in this column (defensive dedup)
+    for (let c = 0; c < imgColumns.length; c++) {
+      if (imgColumns[c].includes(path)) return;
+    }
     let minIdx = 0;
     for (let i = 1; i < columnHeights.length; i++) {
       if (columnHeights[i] < columnHeights[minIdx]) minIdx = i;
