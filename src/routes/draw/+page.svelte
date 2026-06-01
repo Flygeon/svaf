@@ -1375,6 +1375,7 @@ async function startGeneration(mode = 'wai') {
       <Dialog.Description class="text-sm leading-relaxed">
         <div class="space-y-2">
           <div>写实/半写实风格，支持在图中生成文字</div>
+          <div>不会画手，网红脸，挺不赖的</div>
           <div>支持中文自然语言，但英文遵从度可能更好</div>
         </div>
       </Dialog.Description>
