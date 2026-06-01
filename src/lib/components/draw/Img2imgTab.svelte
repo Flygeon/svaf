@@ -17,7 +17,7 @@ import { Badge } from '$lib/components/ui/badge';
     turnstileToken = $bindable(''),
       turnstileTick = $bindable(0),
     pointsCostSubmit = 0,
-    llmTokenPerPoint = 1000,
+    llmTokenPerPoint = 0,
     turnstileEnabled = true,
   }: {
     turnstileToken?: string;
@@ -396,7 +396,7 @@ import { Badge } from '$lib/components/ui/badge';
       <Button size="sm" variant="outline" onclick={handleTranslate} disabled={translating || !cnPrompt.trim()}>
         <Icon icon={translating ? "mdi:loading" : "mdi:auto-fix"} class="size-4 mr-1 {translating ? 'animate-spin' : ''}" />
         {translating ? "转换中..." : "翻译为英文"}
-        {#if llmTokenPerPoint > 0 && cnPrompt?.length}{@const est = Math.max(1, Math.ceil(cnPrompt.length * 2 / (llmTokenPerPoint || 1000)))}<Badge variant="secondary" class="ml-1 text-[10px] px-1">≈⚡{est}</Badge>{/if}
+        {#if llmTokenPerPoint > 0 && cnPrompt?.length}{@const est = Math.max(1, Math.ceil(cnPrompt.length * 2 / (llmTokenPerPoint || 1)))}<Badge variant="secondary" class="ml-1 text-[10px] px-1">≈⚡{est}</Badge>{/if}
       </Button>
       <span class="text-[11px] text-muted-foreground">支持中文，但英文遵从度更好</span>
     </div>

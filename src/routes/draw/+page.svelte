@@ -919,9 +919,9 @@ async function startGeneration(mode = 'wai') {
                 bind:workflowPrompt bind:workflowNegativePrompt bind:width bind:height
                 onsubmit={() => startGeneration('wai')} disabled={queuing || !isLoggedIn} busy={queuing}
                 bind:sameSeed bind:forkSeed
-            llmTokenPerPoint={pointsConfig?.llm_token_per_point ?? 1000}
-            pointsCostSubmit={pointsConfig?.text_to_image ?? 0}
-            turnstileEnabled={pointsConfig?.turnstile_enabled ?? true}
+            llmTokenPerPoint={pointsConfig?.llm_token_per_point}
+            pointsCostSubmit={pointsConfig?.text_to_image}
+            turnstileEnabled={pointsConfig?.turnstile_enabled}
           />
         </TabsContent>
 
@@ -935,18 +935,18 @@ async function startGeneration(mode = 'wai') {
             bind:workflowPrompt bind:workflowNegativePrompt bind:width bind:height
             onsubmit={() => startGeneration('anima')} disabled={queuing || !isLoggedIn} busy={queuing}
             bind:sameSeed bind:forkSeed
-            llmTokenPerPoint={pointsConfig?.llm_token_per_point ?? 1000}
-            pointsCostSubmit={pointsConfig?.text_to_image_anima ?? 20}
+            llmTokenPerPoint={pointsConfig?.llm_token_per_point}
+            pointsCostSubmit={pointsConfig?.text_to_image_anima}
             llmMode="anima"
-            turnstileEnabled={pointsConfig?.turnstile_enabled ?? true}
+            turnstileEnabled={pointsConfig?.turnstile_enabled}
           />
             </TabsContent>
             <TabsContent value="real" class="space-y-4 mt-4">
               <RealTab
                 bind:turnstileToken bind:turnstileTick
-                llmTokenPerPoint={pointsConfig?.llm_token_per_point ?? 1000}
-                pointsCostSubmit={pointsConfig?.text_to_image_real ?? 15}
-                turnstileEnabled={pointsConfig?.turnstile_enabled ?? true}
+                llmTokenPerPoint={pointsConfig?.llm_token_per_point}
+                pointsCostSubmit={pointsConfig?.text_to_image_real}
+                turnstileEnabled={pointsConfig?.turnstile_enabled}
               />
             </TabsContent>
           </Tabs>
@@ -967,14 +967,14 @@ async function startGeneration(mode = 'wai') {
         </TabsContent>
 
         <TabsContent value="img2img" class="mt-4">
-          <Img2imgTab bind:turnstileToken bind:turnstileTick llmTokenPerPoint={pointsConfig?.llm_token_per_point ?? 1000} pointsCostSubmit={pointsConfig?.image_to_image ?? 0} turnstileEnabled={pointsConfig?.turnstile_enabled ?? true} />
+          <Img2imgTab bind:turnstileToken bind:turnstileTick llmTokenPerPoint={pointsConfig?.llm_token_per_point} pointsCostSubmit={pointsConfig?.image_to_image} turnstileEnabled={pointsConfig?.turnstile_enabled} />
         </TabsContent>
 
         <TabsContent value="saloon" class="mt-4">
-          <SaloonTab {workflowPath} {styleTags} {negativePrompt} {directPrompt} {width} {height} {turnstileToken} pointsCostSubmit={selectedMode === 'anima' ? (pointsConfig?.text_to_image_anima ?? 20) : (pointsConfig?.text_to_image ?? 0)} mode={selectedMode} />
+          <SaloonTab {workflowPath} {styleTags} {negativePrompt} {directPrompt} {width} {height} {turnstileToken} pointsCostSubmit={selectedMode === 'anima' ? (pointsConfig?.text_to_image_anima ) : (pointsConfig?.text_to_image )} mode={selectedMode} />
         </TabsContent>
         <TabsContent value="tts" class="mt-4">
-          <TtsTab ttsPerChar={pointsConfig?.tts_per_char ?? 0.01} ttsPerSec={pointsConfig?.tts_per_sec ?? 0.033} ttsMin={pointsConfig?.tts_generate ?? 1} />
+          <TtsTab ttsPerChar={pointsConfig?.tts_per_char} ttsPerSec={pointsConfig?.tts_per_sec} ttsMin={pointsConfig?.tts_generate} />
         </TabsContent>
 
       </Tabs>

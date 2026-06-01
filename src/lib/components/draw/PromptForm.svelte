@@ -34,7 +34,7 @@
 			turnstileTick = $bindable(0),
 		pointsCostSubmit = 0,
 		llmMode = '',
-		llmTokenPerPoint = 1000,
+		llmTokenPerPoint = 0,
 		turnstileEnabled = true,
 	}: {
 		directPrompt?: string;
@@ -243,7 +243,7 @@
 			<Button size="sm" variant="outline" onclick={handleTranslate} disabled={translating || !nlPrompt?.trim()}>
 				<Icon icon={translating ? "mdi:loading" : "mdi:auto-fix"} class="size-4 mr-1 {translating ? 'animate-spin' : ''}" />
 				{translating ? "转换中..." : "转换"}
-				{#if llmTokenPerPoint > 0 && nlPrompt?.length}{@const est = Math.max(1, Math.ceil(nlPrompt.length * 2 / (llmTokenPerPoint || 1000)))}<Badge variant="secondary" class="ml-1 text-[10px] px-1">≈⚡{est}</Badge>{/if}
+				{#if llmTokenPerPoint > 0 && nlPrompt?.length}{@const est = Math.max(1, Math.ceil(nlPrompt.length * 2 / (llmTokenPerPoint || 1)))}<Badge variant="secondary" class="ml-1 text-[10px] px-1">≈⚡{est}</Badge>{/if}
 			</Button>
 			<label class="flex items-center gap-1.5 text-xs cursor-pointer select-none">
 				<Checkbox bind:checked={rewriteMode} />
