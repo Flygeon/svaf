@@ -21,6 +21,7 @@ import { Badge } from '$lib/components/ui/badge';
     turnstileEnabled = true,
     maxImages = 2,
     workflowPath = '',
+    showConsistency = false,
   }: {
     turnstileToken?: string;
       turnstileTick?: number;
@@ -29,6 +30,7 @@ import { Badge } from '$lib/components/ui/badge';
     turnstileEnabled?: boolean;
     maxImages?: number;
     workflowPath?: string;
+    showConsistency?: boolean;
   } = $props();
 
   let currentBaseUrl = $state('');
@@ -43,6 +45,7 @@ import { Badge } from '$lib/components/ui/badge';
   let enPrompt = $state('');
   let uploading = $state(false);
   let translating = $state(false);
+  let consistency = $state(false);
   let uploadProgress = $state(0);
   let error = $state('');
   let queueSuccess = $state('');
@@ -419,6 +422,13 @@ import { Badge } from '$lib/components/ui/badge';
       ></textarea>
     </div>
   </div>
+
+  {#if showConsistency}
+    <label class="flex items-center gap-2 text-xs cursor-pointer">
+      <input type="checkbox" bind:checked={consistency} class="size-4 accent-primary" />
+      <span>人物一致性</span>
+    </label>
+  {/if}
 
   {#if turnstileEnabled}
     <TurnstileWidget
