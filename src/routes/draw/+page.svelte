@@ -43,6 +43,7 @@ import { clearMyImages } from '$lib/draw/api/client';
   let walletTimer: ReturnType<typeof setInterval> | null = null;
   let waiHelpOpen = $state(false);
   let animaHelpOpen = $state(false);
+  let ernieHelpOpen = $state(false);
   let saloonHelpOpen = $state(false);
   let txt2imgHelpOpen = $state(false);
   let img2imgHelpOpen = $state(false);
@@ -1334,6 +1335,21 @@ async function startGeneration(mode = 'wai') {
           </ol>
           <div>支持中文描述，但<strong>英文描述的遵从度更高</strong>。</div>
           <div class="text-muted-foreground text-xs">💡 翻译功能基于内置 LLM，也可以用 DeepSeek、豆包、ChatGPT 等外部 AI 来生成 Tag。</div>
+        </div>
+      </Dialog.Description>
+    </Dialog.Header>
+  </Dialog.Content>
+</Dialog.Root>
+
+<Dialog.Root open={ernieHelpOpen} onOpenChange={(o) => ernieHelpOpen = o}>
+  <Dialog.Content class="max-w-md">
+    <Dialog.Header>
+      <Dialog.Title>ℹ️ 关于 Ernie</Dialog.Title>
+      <Dialog.Description class="text-sm leading-relaxed">
+        <div class="space-y-2">
+          <div>Ernie 是生图模型，基于 <strong>ERNIE-Redmix</strong>。</div>
+          <div><strong>支持写字</strong>——可以在图片中生成文字。</div>
+          <div>使用 <strong>英文提示词</strong> 可以获得更好的效果。</div>
         </div>
       </Dialog.Description>
     </Dialog.Header>
