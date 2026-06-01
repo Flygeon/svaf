@@ -269,3 +269,7 @@ export async function resolveRecommendations(recIds: string[], action: 'approve'
       json: cfg
     });
   }
+
+  export async function fetchStats() {
+    return drawRequest<{ stats: Record<string, any>; income: Record<string, number> }>('/api/draw/admin/stats');
+  }
