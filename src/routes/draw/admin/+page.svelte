@@ -200,6 +200,8 @@ let loadingMore = $state(false);
   let debugError = $state('');
   let statsData = $state<any>(null);
   let statsLoading = $state(false);
+  let statsData = $state<any>(null);
+  let statsLoading = $state(false);
 
 
 
