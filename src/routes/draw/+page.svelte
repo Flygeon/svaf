@@ -991,7 +991,7 @@ async function startGeneration(mode = 'wai') {
               <Img2imgTab bind:turnstileToken bind:turnstileTick llmTokenPerPoint={pointsConfig?.llm_token_per_point} pointsCostSubmit={pointsConfig?.image_to_image} turnstileEnabled={pointsConfig?.turnstile_enabled} />
             </TabsContent>
             <TabsContent value="qwen" class="mt-4">
-              <Img2imgTab bind:turnstileToken bind:turnstileTick llmTokenPerPoint={pointsConfig?.llm_token_per_point} pointsCostSubmit={pointsConfig?.image_to_image} turnstileEnabled={pointsConfig?.turnstile_enabled} maxImages={3} workflowPath="Qwen/qwen2511_lowvram.json" showConsistency={true} />
+              <Img2imgTab bind:turnstileToken bind:turnstileTick llmTokenPerPoint={pointsConfig?.llm_token_per_point} pointsCostSubmit={pointsConfig?.image_to_image_qwen} turnstileEnabled={pointsConfig?.turnstile_enabled} maxImages={3} workflowPath="Qwen/qwen2511_lowvram.json" showConsistency={true} />
             </TabsContent>
           </Tabs>
         </TabsContent>
