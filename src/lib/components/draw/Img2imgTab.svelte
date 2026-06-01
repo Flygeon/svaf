@@ -11,7 +11,7 @@ import { Badge } from '$lib/components/ui/badge';
   import { addToQueue } from '$lib/draw/api/client';
   import { get } from 'svelte/store';
 
-  const STORAGE_KEY = 'draw-img2img';
+  const STORAGE_KEY = 'draw-img2img-' + (workflowPath || 'flux');
 
   let {
     turnstileToken = $bindable(''),
