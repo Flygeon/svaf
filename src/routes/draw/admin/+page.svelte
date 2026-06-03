@@ -1074,15 +1074,24 @@ function formatTime(ts: number) {
                         class="w-full rounded-md overflow-hidden border {selectedPaths.has(img.path) ? 'ring-2 ring-primary' : ''}"
                         onclick={() => { if (selectMode) toggleSelect(img.path); else openLb(img.path); }}
                       >
-                        <img
-                          src={getImageProxyUrl(img.path)}
-                          alt={img.path}
-                          loading="lazy"
-                          decoding="async"
-                          style="aspect-ratio: 1;"
-                          onload={handleImgLoad}
-                          class="block w-full h-auto bg-muted"
-                        />
+                        <div class="relative">
+                          <img
+                            src={getImageProxyUrl(img.path)}
+                            alt={img.path}
+                            loading="lazy"
+                            decoding="async"
+                            style="aspect-ratio: 1;"
+                            onload={handleImgLoad}
+                            class="block w-full h-auto bg-muted {img.deleted ? 'opacity-50' : ''}"
+                          />
+                          {#if img.deleted}
+                            <div class="absolute inset-0 pointer-events-none">
+                              <svg viewBox="0 0 100 100" class="w-full h-full">
+                                <line x1="5" y1="95" x2="95" y2="5" stroke="rgba(220,38,38,0.7)" stroke-width="6" stroke-linecap="round" />
+                              </svg>
+                            </div>
+                          {/if}
+                        </div>
                       </button>
                       {#if selectMode}
                     <div class="absolute top-1 left-1 flex gap-1 items-start">
