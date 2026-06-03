@@ -169,7 +169,7 @@ function statusLabel(s: string): string {
   <div class="flex gap-2">
     <button onclick={() => { mode = 'preset'; handleReset(); }} class="px-3 py-1.5 text-xs rounded-lg border {mode === 'preset' ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">预设音色</button>
     <button onclick={() => { mode = 'custom'; handleReset(); }} class="px-3 py-1.5 text-xs rounded-lg border {mode === 'custom' ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">自定义音色</button>
-    <button onclick={() => { mode = 'clone'; handleReset(); }} class="px-3 py-1.5 text-xs rounded-lg border {mode === 'clone' ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">声音克隆</button>
+    <button disabled class="px-3 py-1.5 text-xs rounded-lg border bg-muted text-muted-foreground cursor-not-allowed opacity-50" title="声音克隆暂不可用（需上传参考音频）">声音克隆</button>
   </div>
 
   {#if mode === 'preset'}
