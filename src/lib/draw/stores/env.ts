@@ -152,31 +152,20 @@ export async function resolveApiRedirect(force = false): Promise<void> {
     const t0 = Date.now();
     addRedirectLog(`[${(Date.now()-t0)}ms] 开始检测 ${baseUrl}/health`);
     try {
-      // 不跟随重定向，手动分步追踪
-      const step1 = await fetch(`${baseUrl}/health?_t=${Date.now()}`, { method: 'GET', redirect: 'manual' });
-      addRedirectLog(`[${(Date.now()-t0)}ms] 第一步: status=${step1.status} type=${step1.type} url=${step1.url}`);
-      if (step1.status >= 300 && step1.status < 400) {
-        const location = step1.headers.get('Location') || '?';
-        addRedirectLog(`[${(Date.now()-t0)}ms] 重定向到: ${location}`);
-        try {
-          const step2 = await fetch(location, { method: 'GET' });
-          addRedirectLog(`[${(Date.now()-t0)}ms] 第二步: status=${step2.status} url=${step2.url}`);
-          let body = '';
-          try { body = await step2.text(); body = body.slice(0, 500); } catch {}
-          if (body) addRedirectLog(`[${(Date.now()-t0)}ms] 内容: ${body}`);
-          if (!step2.ok) { addRedirectLog(`[${(Date.now()-t0)}ms] 第二步不 OK`); throw new Error('health check failed'); }
-          const finalUrl = new URL(step2.url.replace(/\/health[\?&].*$/, '').replace(/\/health$/, '')).origin;
-          addRedirectLog(`[${(Date.now()-t0)}ms] 最终=${finalUrl}`);
-          drawEnv.customBaseUrl.set(finalUrl);
-        } catch (e2: any) {
-          addRedirectLog(`[${(Date.now()-t0)}ms] 第二步失败: ${e2.message || ''}`);
-          throw e2;
-        }
+      const resp = await fetch(`${baseUrl}/health?_t=${Date.now()}`, { method: 'GET' });
+      const finalUrl = resp.url.replace(/\/health[\?&].*$/, '').replace(/\/health$/, '');
+      addRedirectLog(`[${(Date.now()-t0)}ms] 响应 status=${resp.status} url=${resp.url}`);
+      if (finalUrl !== baseUrl) {
+        addRedirectLog(`[${(Date.now()-t0)}ms] 检测到重定向 ${baseUrl} -> ${finalUrl}`);
+      }
+      if (!resp.ok) { addRedirectLog(`[${(Date.now()-t0)}ms] 不 OK`); throw new Error('health check failed'); }
+      let body = '';
+      try { const clone = resp.clone(); body = await clone.text(); body = body.slice(0, 500); } catch {}
+      if (body) addRedirectLog(`[${(Date.now()-t0)}ms] 内容: ${body}`);
+      if (finalUrl !== baseUrl && finalUrl.startsWith('http')) {
+        addRedirectLog(`[${(Date.now()-t0)}ms] 切换至 ${finalUrl}`);
+        drawEnv.customBaseUrl.set(finalUrl);
       } else {
-        let body = '';
-        try { const clone = step1.clone(); body = await clone.text(); body = body.slice(0, 500); } catch {}
-        if (body) addRedirectLog(`[${(Date.now()-t0)}ms] 内容: ${body}`);
-        if (!step1.ok) { addRedirectLog(`[${(Date.now()-t0)}ms] 不 OK`); throw new Error('health check failed'); }
         addRedirectLog(`[${(Date.now()-t0)}ms] 无重定向，使用 ${baseUrl}`);
       }
       _redirectResolved = true;
