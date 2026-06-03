@@ -21,6 +21,8 @@ function buildUrl(
     if (v === undefined || v === null || v === '') continue;
     url.searchParams.set(k, String(v));
   }
+  // 每个请求带时间戳，防止 CDN/浏览器缓存
+  url.searchParams.set('_t', String(Date.now()));
   return url.toString();
 }
 
