@@ -180,28 +180,48 @@ onMount(async () => {
 
   <!-- Audio Tags -->
   <div class="space-y-1.5">
-    <Label>音频标签 <span class="text-muted-foreground text-[10px]">(点击添加，自动嵌入合成文本)</span></Label>
-    <div class="flex flex-wrap gap-1">
+    <Label>音频标签 <span class="text-muted-foreground text-[10px]">(点击添加，自动嵌入合成文本开头)</span></Label>
+    <div><span class="text-[9px] text-muted-foreground">基础情绪</span>
       {#each ['开心','悲伤','愤怒','恐惧','惊讶','兴奋','委屈','平静','冷漠'] as tag}
-        <button onclick={() => { audioTags = audioTags.includes(tag) ? audioTags.replace('('+tag+')','').trim() : audioTags + '('+tag+')' }} class="px-2 py-0.5 text-[10px] rounded-full border {audioTags.includes(tag) ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">{tag}</button>
+        <button onclick={() => { audioTags = audioTags.includes(tag) ? audioTags.replace('('+tag+')','').trim() : audioTags + '('+tag+')' }} class="px-2 py-0.5 text-[10px] rounded-full border m-0.5 {audioTags.includes(tag) ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">{tag}</button>
       {/each}
     </div>
-    <div class="flex flex-wrap gap-1">
+    <div><span class="text-[9px] text-muted-foreground">复合情绪</span>
+      {#each ['怅然','欣慰','无奈','愧疚','释然','嫉妒','厌倦','忐忑','动情'] as tag}
+        <button onclick={() => { audioTags = audioTags.includes(tag) ? audioTags.replace('('+tag+')','').trim() : audioTags + '('+tag+')' }} class="px-2 py-0.5 text-[10px] rounded-full border m-0.5 {audioTags.includes(tag) ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">{tag}</button>
+      {/each}
+    </div>
+    <div><span class="text-[9px] text-muted-foreground">整体语调</span>
       {#each ['温柔','高冷','活泼','严肃','慵懒','俏皮','深沉','干练','凌厉'] as tag}
-        <button onclick={() => { audioTags = audioTags.includes(tag) ? audioTags.replace('('+tag+')','').trim() : audioTags + '('+tag+')' }} class="px-2 py-0.5 text-[10px] rounded-full border {audioTags.includes(tag) ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">{tag}</button>
+        <button onclick={() => { audioTags = audioTags.includes(tag) ? audioTags.replace('('+tag+')','').trim() : audioTags + '('+tag+')' }} class="px-2 py-0.5 text-[10px] rounded-full border m-0.5 {audioTags.includes(tag) ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">{tag}</button>
       {/each}
     </div>
-    <div class="flex flex-wrap gap-1">
-      {#each ['磁性','甜美','清亮','空灵','沙哑','醇厚','稚嫩','苍老','御姐音','正太音','大叔音','台湾腔'] as tag}
-        <button onclick={() => { audioTags = audioTags.includes(tag) ? audioTags.replace('('+tag+')','').trim() : audioTags + '('+tag+')' }} class="px-2 py-0.5 text-[10px] rounded-full border {audioTags.includes(tag) ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">{tag}</button>
+    <div><span class="text-[9px] text-muted-foreground">音色定位</span>
+      {#each ['磁性','醇厚','清亮','空灵','稚嫩','苍老','甜美','沙哑','醇雅'] as tag}
+        <button onclick={() => { audioTags = audioTags.includes(tag) ? audioTags.replace('('+tag+')','').trim() : audioTags + '('+tag+')' }} class="px-2 py-0.5 text-[10px] rounded-full border m-0.5 {audioTags.includes(tag) ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">{tag}</button>
       {/each}
     </div>
-    <div class="flex flex-wrap gap-1">
-      {#each ['笑','轻语','叹气','深呼吸','哽咽','颤抖','语速加快','语速减慢','小声','气声'] as tag}
-        <button onclick={() => { const fmt = tag.includes('语速') ? '['+tag+']' : '['+tag+']'; audioTags = audioTags.includes(tag) ? audioTags.replace('['+tag+']','').trim() : audioTags + fmt }} class="px-2 py-0.5 text-[10px] rounded-full border {audioTags.includes(tag) ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">{tag}</button>
+    <div><span class="text-[9px] text-muted-foreground">人设腔调</span>
+      {#each ['夹子音','御姐音','正太音','大叔音','台湾腔'] as tag}
+        <button onclick={() => { audioTags = audioTags.includes(tag) ? audioTags.replace('('+tag+')','').trim() : audioTags + '('+tag+')' }} class="px-2 py-0.5 text-[10px] rounded-full border m-0.5 {audioTags.includes(tag) ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">{tag}</button>
       {/each}
     </div>
-    <input bind:value={audioTags} placeholder="也可手动输入自定义标签，如(东北话)[嚎啕大哭]"
+    <div><span class="text-[9px] text-muted-foreground">方言</span>
+      {#each ['东北话','四川话','河南话','粤语'] as tag}
+        <button onclick={() => { audioTags = audioTags.includes(tag) ? audioTags.replace('('+tag+')','').trim() : audioTags + '('+tag+')' }} class="px-2 py-0.5 text-[10px] rounded-full border m-0.5 {audioTags.includes(tag) ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">{tag}</button>
+      {/each}
+    </div>
+    <div><span class="text-[9px] text-muted-foreground">细粒度控制 <span class="text-muted-foreground/60">([标签] 格式嵌入文本中间)</span></span>
+      {#each ['笑','轻笑','大笑','冷笑','抽泣','呜咽','哽咽','嚎啕大哭','紧张','害怕','激动','疲惫','委屈','撒娇','心虚','震惊','不耐烦','颤抖','声音颤抖','变调','破音','鼻音','气声','沙哑','吸气','深呼吸','叹气','长叹一口气','喘息','屏息','语速加快','语速减慢','小声'] as tag}
+        <button onclick={() => { const fmt = '['+tag+']'; audioTags = audioTags.includes(tag) ? audioTags.replace('['+tag+']','').trim() : audioTags + fmt }} class="px-2 py-0.5 text-[10px] rounded-full border m-0.5 {audioTags.includes(tag) ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">{tag}</button>
+      {/each}
+    </div>
+    <div><span class="text-[9px] text-muted-foreground">特殊</span>
+      {#each ['唱歌','孙悟空','林黛玉'] as tag}
+        <button onclick={() => { audioTags = audioTags.includes(tag) ? audioTags.replace('('+tag+')','').trim() : audioTags + '('+tag+')' }} class="px-2 py-0.5 text-[10px] rounded-full border m-0.5 {audioTags.includes(tag) ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">{tag}</button>
+      {/each}
+    </div>
+    <input bind:value={audioTags} placeholder="也可手动输入，多个标签直接拼接如(开心)[深呼吸]你好呀"
       class="w-full rounded-lg border border-input bg-background px-3 py-2 text-xs placeholder:text-muted-foreground" />
   </div>
 
