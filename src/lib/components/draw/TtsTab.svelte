@@ -35,6 +35,7 @@ let targetText = $state('');
 let language = $state('auto');
 let submitting = $state(false);
 let error = $state('');
+let audioTags = $state('');
 
 let resultUrl = $state('');
 let done = $state(false);
@@ -67,6 +68,7 @@ async function handleSubmit() {
         mode: mode,
         speaker: mode === 'preset' ? selectedSpeaker : undefined,
         instruct: instruct || undefined,
+        tags: audioTags || undefined,
         ref_audio_name: refName,
       },
       requiresAuth: true,
@@ -175,6 +177,33 @@ onMount(async () => {
         class="w-full rounded-lg border border-input bg-background px-3 py-2 text-xs placeholder:text-muted-foreground resize-none"></textarea>
     </div>
   {/if}
+
+  <!-- Audio Tags -->
+  <div class="space-y-1.5">
+    <Label>音频标签 <span class="text-muted-foreground text-[10px]">(点击添加，自动嵌入合成文本)</span></Label>
+    <div class="flex flex-wrap gap-1">
+      {#each ['开心','悲伤','愤怒','恐惧','惊讶','兴奋','委屈','平静','冷漠'] as tag}
+        <button onclick={() => { audioTags = audioTags.includes(tag) ? audioTags.replace('('+tag+')','').trim() : audioTags + '('+tag+')' }} class="px-2 py-0.5 text-[10px] rounded-full border {audioTags.includes(tag) ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">{tag}</button>
+      {/each}
+    </div>
+    <div class="flex flex-wrap gap-1">
+      {#each ['温柔','高冷','活泼','严肃','慵懒','俏皮','深沉','干练','凌厉'] as tag}
+        <button onclick={() => { audioTags = audioTags.includes(tag) ? audioTags.replace('('+tag+')','').trim() : audioTags + '('+tag+')' }} class="px-2 py-0.5 text-[10px] rounded-full border {audioTags.includes(tag) ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">{tag}</button>
+      {/each}
+    </div>
+    <div class="flex flex-wrap gap-1">
+      {#each ['磁性','甜美','清亮','空灵','沙哑','醇厚','稚嫩','苍老','御姐音','正太音','大叔音','台湾腔'] as tag}
+        <button onclick={() => { audioTags = audioTags.includes(tag) ? audioTags.replace('('+tag+')','').trim() : audioTags + '('+tag+')' }} class="px-2 py-0.5 text-[10px] rounded-full border {audioTags.includes(tag) ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">{tag}</button>
+      {/each}
+    </div>
+    <div class="flex flex-wrap gap-1">
+      {#each ['笑','轻语','叹气','深呼吸','哽咽','颤抖','语速加快','语速减慢','小声','气声'] as tag}
+        <button onclick={() => { const fmt = tag.includes('语速') ? '['+tag+']' : '['+tag+']'; audioTags = audioTags.includes(tag) ? audioTags.replace('['+tag+']','').trim() : audioTags + fmt }} class="px-2 py-0.5 text-[10px] rounded-full border {audioTags.includes(tag) ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-accent'} transition-colors">{tag}</button>
+      {/each}
+    </div>
+    <input bind:value={audioTags} placeholder="也可手动输入自定义标签，如(东北话)[嚎啕大哭]"
+      class="w-full rounded-lg border border-input bg-background px-3 py-2 text-xs placeholder:text-muted-foreground" />
+  </div>
 
   <!-- Language -->
   <div class="space-y-1.5">
