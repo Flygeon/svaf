@@ -56,13 +56,16 @@ let selectedPresetIdx = $state<number>(-1);
 let presetName = $state('');
 let systemPrompt = $state('');
 let chatMessages = $state<ChatMessage[]>([]);
-let ttsLoading = $state<Record<number, boolean>>({});
-let ttsAudio = $state<Record<number, string>>({});
+let ttsEnabled = $state(typeof localStorage !== 'undefined' ? localStorage.getItem('saloon-tts') === 'true' : false);
+let ttsLoading = $state(false);
+let ttsAudioUrl = $state('');
+$effect(() => { if (ttsAudioUrl) { try { document.getElementById('saloon-tts-player')?.click(); } catch {} } });
+$effect(() => { try { localStorage.setItem('saloon-tts', String(ttsEnabled)); } catch {} });
 
-async function speakMessage(idx: number, text: string) {
-  if (ttsLoading[idx]) return;
-  ttsLoading = { ...ttsLoading, [idx]: true };
-  ttsAudio = { ...ttsAudio, [idx]: '' };
+async function speakMessage(text: string) {
+  if (ttsLoading || !text) return;
+  ttsLoading = true;
+  ttsAudioUrl = '';
   try {
     const res = await drawRequest<{ ok: boolean; filename: string }>('/api/draw/tts/synthesize', {
       method: 'POST',
@@ -76,10 +79,10 @@ async function speakMessage(idx: number, text: string) {
       requiresAuth: true,
     });
     if (res.ok && res.filename) {
-      ttsAudio = { ...ttsAudio, [idx]: getImageUrl(res.filename) };
+      ttsAudioUrl = getImageUrl(res.filename);
     }
   } catch {}
-  ttsLoading = { ...ttsLoading, [idx]: false };
+  ttsLoading = false;
 }
 let chatHistory = $state<Array<{ role: string; content: string; imageUrls?: string[]; systemPrompt?: string }>>([]);
 let inputText = $state('');
@@ -255,6 +258,9 @@ async function sendMessage() {
 
     chatMessages = chatMessages.map((m, i) => i === assistantIdx ? { ...m, streaming: false } : m);
 
+    // 朗读模式：自动 TTS
+    if (ttsEnabled && textContent.trim()) { speakMessage(textContent); }
+
     // 历史保存原始 fullText（含 [GEN:] 标签），让 LLM 能看到之前的生图 tags
     // 显示用 textContent（干净文本），UI 已过滤
     chatHistory = [...chatHistory, { role: 'user', content: msg, systemPrompt }, { role: 'assistant', content: fullText }];
@@ -404,6 +410,8 @@ async function sendNudge() {
       }
     }
     chatMessages = chatMessages.map((m, i) => i === nudgeIdx ? { ...m, streaming: false } : m);
+    // 朗读模式：自动 TTS
+    if (ttsEnabled && fullText.trim()) { speakMessage(fullText); }
     chatHistory = [...chatHistory, { role: 'assistant', content: fullText }];
     if (chatHistory.length > 40) chatHistory = chatHistory.slice(-40);
     try {
@@ -507,22 +515,6 @@ $effect(() => {
             </div>
           {/if}
 
-          <!-- TTS 朗读 -->
-          {#if msg.role === 'assistant' && msg.content && !msg.streaming}
-            <div class="flex items-center gap-1 mt-1.5">
-              {#if ttsAudio[i]}
-                <audio src={ttsAudio[i]} controls class="h-8 max-w-[160px]" preload="none"></audio>
-                <button onclick={() => { ttsAudio = { ...ttsAudio, [i]: '' }; }} class="size-6 flex items-center justify-center rounded hover:bg-background/20 shrink-0" title="关闭">
-                  <Icon icon="mdi:close" class="size-3.5" />
-                </button>
-              {:else}
-                <button onclick={() => speakMessage(i, msg.content)} disabled={ttsLoading[i]} class="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50">
-                  <Icon icon={ttsLoading[i] ? 'mdi:loading' : 'mdi:volume-high'} class="size-3.5 {ttsLoading[i] ? 'animate-spin' : ''}" />
-                  {ttsLoading[i] ? '合成中...' : '朗读'}
-                </button>
-              {/if}
-            </div>
-          {/if}
         </div>
       </div>
     {/each}
@@ -545,6 +537,9 @@ $effect(() => {
       {#if sending}<Icon icon="mdi:loading" class="size-4 animate-spin" />{:else}<Icon icon="mdi:send" class="size-4" />{/if}
     </Button>
   </div>
+  {#if ttsAudioUrl}
+    <audio src={ttsAudioUrl} controls autoplay class="w-full h-9 mt-1" onended={() => { ttsAudioUrl = ''; }}></audio>
+  {/if}
 
   {#if errorText}
     <Alert variant="destructive" class="mt-2">
@@ -561,4 +556,8 @@ $effect(() => {
       <span class="font-medium text-foreground">共 {totalLlmCost + totalGenCost} 点</span>
     </div>
   {/if}
-</div>
+</div>      </button>
+      <button class="flex items-center gap-1 px-2 text-xs transition-colors {ttsEnabled ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}" onclick={() => { ttsEnabled = !ttsEnabled; }} title={ttsEnabled ? '朗读已开启，AI回复后自动语音朗读' : '朗读已关闭'}>
+        <Icon icon={ttsLoading ? 'mdi:loading' : 'mdi:volume-high'} class="size-4 {ttsLoading ? 'animate-spin' : ''}" />
+        <span class="hidden sm:inline">{ttsLoading ? '朗读中' : ttsEnabled ? '朗读' : '静音'}</span>
+      </button>
