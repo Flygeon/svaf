@@ -24,7 +24,6 @@ let selectedSpeaker = $state('Vivian');
 
 // Clone & Custom mode
 let instruct = $state('');
-let refText = $state('');
 
 // Audio upload (clone only)
 let audioFile = $state<File | null>(null);
@@ -162,7 +161,7 @@ onMount(async () => {
   {:else}
     <!-- Voice Clone -->
     <div class="space-y-1.5">
-      <Label for="tts-refaudio">参考音频 <span class="text-muted-foreground text-[10px]">(可选)</span></Label>
+      <Label for="tts-refaudio">参考音频</Label>
       <input id="tts-refaudio" type="file" accept="audio/*" onchange={handleFileSelect}
         class="block w-full text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer" />
       {#if audioFile}
@@ -172,9 +171,7 @@ onMount(async () => {
     </div>
     <div class="space-y-1.5">
       <Label for="tts-reftext">参考文本 <span class="text-muted-foreground text-[10px]">(可选)</span></Label>
-      <textarea id="tts-reftext" bind:value={refText} rows={2}
-        placeholder="输入参考音频对应的文本内容"
-        class="w-full rounded-lg border border-input bg-background px-3 py-2 text-xs placeholder:text-muted-foreground resize-none"></textarea>
+      <div class="text-[10px] text-muted-foreground">上传参考音频后即可克隆音色，无需填写文本</div>
     </div>
   {/if}
 
