@@ -189,6 +189,7 @@ export async function addToQueue(payload: {
     language?: string;
     ref_text?: string;
     ref_audio_name?: string;
+    source?: string;
 }) {
   return drawRequest<{ queued: boolean; position: number; item_id: number }>('/api/draw/queue', {
     method: 'POST',
@@ -437,36 +438,6 @@ export async function clearMyImages() {
 
 // --- TTS ---
 
-export async function generateTts(formData: FormData) {
-  return drawRequest<{ queued: boolean; item_id: number; position: number }>('/api/draw/tts/generate', {
-    method: 'POST',
-    body: formData,
-    requiresAuth: true,
-  });
-}
-
-export async function fetchTtsStatus(id: number) {
-  return drawRequest<{ id: number; status: string; created_at: number; started_at?: number; finished_at?: number; error?: string; position?: number | null }>(
-    `/api/draw/tts/status/${id}`,
-    { requiresAuth: true }
-  );
-}
-
-export async function fetchTtsMyQueue() {
-  return drawRequest<{ items: Array<{ id: number; status: string; created_at: number; started_at?: number; finished_at?: number; error?: string; position?: number | null }> }>(
-    '/api/draw/tts/my-queue',
-    { requiresAuth: true }
-  );
-}
-
-export function getTtsResultUrl(id: number): string {
-  const token = forumAuth.getToken();
-  const baseUrl = get(drawEnv.baseUrl);
-  const url = new URL(`/api/draw/tts/result/${id}`, baseUrl);
-  if (token) url.searchParams.set('token', token);
-  return url.toString();
-}
-
 export async function fetchTtsMyRecords() {
   return drawRequest<{ items: Array<{ id: number; user_id: number; text: string; refText: string | null; xVectorMode: boolean; language: string; audioDuration: number; cost: number; outputPath: string | null; created_at: number; finished_at: number }>; total: number }>(
     '/api/draw/tts/my-records',
@@ -510,10 +481,3 @@ export async function uploadTtsRefAudio(file: File): Promise<{ filename: string 
   return resp.json();
 }
 
-export async function generateTtsCustomVoice(data: { text: string; speaker: string; language?: string; instruct?: string }) {
-  return drawRequest<{ queued: boolean; item_id: number; position: number }>('/api/draw/tts/custom-voice', {
-    method: 'POST',
-    json: data,
-    requiresAuth: true,
-  });
-}
