@@ -1831,13 +1831,15 @@ function formatTime(ts: number) {
                 </div>
                 <div class="border rounded-lg p-3">
                   <div class="text-xs font-medium mb-2">按类型</div>
-                  {@const imgTotal = storageItems.reduce((s, i) => s + i.img_size, 0)}
-                  {@const audTotal = storageItems.reduce((s, i) => s + i.aud_size, 0)}
-                  <PieChart
-                    items={[{ label: '图片', size: imgTotal }, { label: '音频', size: audTotal }]}
-                    colorScheme={['#3b82f6', '#f59e0b']}
-                    size={160} maxSlices={2}
-                  />
+                  {#if storageItems.length > 0}
+                    {@const imgTotal = storageItems.reduce((s, i) => s + i.img_size, 0)}
+                    {@const audTotal = storageItems.reduce((s, i) => s + i.aud_size, 0)}
+                    <PieChart
+                      items={[{ label: '图片', size: imgTotal }, { label: '音频', size: audTotal }]}
+                      colorScheme={['#3b82f6', '#f59e0b']}
+                      size={160} maxSlices={2}
+                    />
+                  {/if}
                 </div>
               </div>
               <div class="space-y-1 max-h-[600px] overflow-y-auto">
