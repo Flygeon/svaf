@@ -1298,9 +1298,9 @@ async function startGeneration(mode = 'wai') {
     100% { background-position: 0% 50%; }
   }
 
-	/* 全局 flex 防溢出 */
-	.flex-1 { min-width: 0; }
-	.flex-wrap { overflow-wrap: break-word; }
+  /* 全局 flex 防溢出 */
+  .flex-1 { min-width: 0; }
+  .flex-wrap { overflow-wrap: break-word; }
 
 
 </style>
