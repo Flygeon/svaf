@@ -1,6 +1,7 @@
 {
 	"name": "YFY0109",
-	"avatar": "/favicon/yfy.png",
-	"description": "罗悦晗，我爱你！（链接是备用站）",
-	"url": "https://yfy0109.github.io/"
+	"avatar": "https://yfy0109.github.io/yfy.jpg",
+	"description": "YFY的个人介绍站（链接是备用站）",
+	"url": "https://yfy0109.github.io/",
+  "backlink": "https://yfy0109.github.io/"
 }
